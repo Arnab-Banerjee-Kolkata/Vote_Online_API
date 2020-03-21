@@ -1,8 +1,8 @@
 # Vote_Online_API
 
-Election status::\n
-    0: pending\n
-    1: live\n
-    2: over but result pending\n
-    3: over and result declared\n
-    4: cancelled\n
+Election status::<br>
+    0: pending<br>
+    1: live<br>
+    2: over but result pending<br>
+    3: over and result declared<br>
+    4: cancelled<br>
