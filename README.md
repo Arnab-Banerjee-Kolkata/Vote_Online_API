@@ -1,6 +1,6 @@
 # Vote_Online_API
 
-*Election status::*
+Election status::
     0: pending
     1: live
     2: over but result pending
