@@ -34,7 +34,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt3->close();
     $response['validAuth']=true;
 
-    $party=array();
+    $partyList=array();
 
 
     $stmt=$conn->prepare("SELECT name, symbol FROM Party");
@@ -43,15 +43,15 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 
     while($stmt->fetch())
     {
-        $temp=array();
-        $temp['name']=$name;
-        $temp['symbol']=$symbol;
+        $party=array();
+        $party['name']=$name;
+        $party['symbol']=$symbol;
 
-        array_push($party, $temp);
+        array_push($partyList, $party);
     }
     $stmt->close();
 
-    $response['partyList']=$party;
+    $response['partyList']=$partyList;
 
     $response['success']=true;
 }
