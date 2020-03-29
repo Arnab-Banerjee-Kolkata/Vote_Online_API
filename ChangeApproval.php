@@ -24,6 +24,7 @@ $response['success']=false;
 $response['validAuth']=false;
 $response['validElection']=false;
 $response['validAadhaar']=false;
+$response['validApproval']=false;
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
 $stmt3->bind_param("s", $key_name);
@@ -66,17 +67,25 @@ if($stmt3->fetch() && $postAuthKey==$postAuthKey2)
                 $stmt->execute();
                 
                 $stmt->close();
+                $response['validApproval']=true;
+                $response['success']=true;
             }
-            else
+            else if($approvalState==0)
             {
                 $stmt=$conn->prepare("DELETE FROM Govt_Approval WHERE election_id=? AND aadhaar_no=?");
                 $stmt->bind_param("ss", $electionId, $aadhaarNo);
                 $stmt->execute();
                 
                 $stmt->close();
+                $response['validApproval']=true;
+                $response['success']=true;
+            }
+            else
+            {
+                $response['success']=false;
             }
             
-            $response['success']=true;
+            
         }
     }
 }
