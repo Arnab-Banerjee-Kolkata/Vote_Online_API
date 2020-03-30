@@ -7,7 +7,6 @@
 
 function sendOTP($countryCode, $regMobNo, $voterOTP, $API_KEY)
 {
-    //$API_KEY='Fc4V2GCvV40-FI9ZBaCcRjDtTYFVsYcA7YV0YfDv1p';
  
 	$Textlocal = new Textlocal(false, false, $API_KEY);
  
@@ -18,7 +17,6 @@ function sendOTP($countryCode, $regMobNo, $voterOTP, $API_KEY)
         try{
  
 	$result =$Textlocal->sendSms($numbers, $message, $sender);
-	//print_r($result);
         }catch(Exception $e)
         {
                 die('Error: '.$e->getMessage());
@@ -50,6 +48,8 @@ $stmt->bind_param("s", $aadhaarNo);
 
 $response=array();
 $response['success']=false;
+$response['validAadhaar']=false;
+$response['validSmsAuth']=false;
 
 $stmt->execute();
 
@@ -68,6 +68,7 @@ if($stmt->fetch())
         if($stmt2->fetch())
         {
                 $stmt2->close();
+                $response['validAadhaar']=true;
 
                 $key_name="sms_auth_key";
 
@@ -81,6 +82,7 @@ if($stmt->fetch())
                 if($stmt3->fetch() && $smsAuthKey1==$smsAuthKey2)
                 {
                     $stmt3->close();
+                    $response['validSmsAuth']=true;
                 
                     if(sendOTP($countryCode, $regMobNo, $voterOTP, $API_KEY))
                         $response['success']=true;
