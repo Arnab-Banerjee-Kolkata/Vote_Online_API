@@ -28,6 +28,7 @@ $response['validElection']=false;
 $response['validAadhaar']=false;
 $response['validAuth']=false;
 $response['validConstituency']=false;
+$response['validApproval']=false;
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
 $stmt3->bind_param("s", $key_name);
@@ -69,8 +70,21 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             
             if($stmt2->fetch() && $count2==1)
             {
-                    $stmt2->close();
-                    $response['validAadhaar']=true;
+                $stmt2->close();
+                $response['validAadhaar']=true;
+
+                $stmt=$conn->prepare("SELECT COUNT(aadhaar_no) FROM Govt_Approval WHERE aadhaar_no=? AND election_id=?");
+                $stmt->bind_param("sd", $aadhaarNo, $electionId);
+                $stmt->execute();
+                $stmt->bind_result($count);
+
+                if($stmt->fetch() && $count==1)
+                {
+                    $stmt->close();
+                    $count=0;
+                    $response['validApproval']=true;
+
+
 
                     $stmt=$conn->prepare("SELECT type from Pub_Govt_Election where id=?");
                     $stmt->bind_param("s", $electionId);
@@ -130,7 +144,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                         $stmt->close();
 
                         $stmt=$conn->prepare("DELETE FROM Govt_Approval WHERE election_id=? AND aadhaar_no=?");
-                        $stmt->bind_param("s",$electionId, $aadhaarNo);
+                        $stmt->bind_param("ds",$electionId, $aadhaarNo);
                         $stmt->execute();
                         
                         $stmt->close();
@@ -139,6 +153,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 
                         $response['candidates']=$candidate;
                     }
+                }
             }
     }
 
