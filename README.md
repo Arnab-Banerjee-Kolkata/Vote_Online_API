@@ -6,8 +6,8 @@ Election status::<br>
     2: over but result pending<br>
     3: over and result declared<br>
     4: cancelled<br>
-
-
-ValidateOtp category::
-    voter: When voter's OTP is needed to be validated from Remote Polling Device
-    booth: When booth's OTP is needed to be validated from Voter's device
+<br>
+<br>
+ValidateOtp category::<br>
+    voter: When voter's OTP is needed to be validated from Remote Polling Device<br>
+    booth: When booth's OTP is needed to be validated from Voter's device<br>
