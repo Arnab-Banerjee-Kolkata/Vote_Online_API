@@ -58,6 +58,8 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         if($type=="VIDHAN SABHA")
         {   
             $stmt->close();
+            $response['validState']=true;
+            $count=-1;
 
             $stmt=$conn->prepare("SELECT COUNT(id), status FROM State_Election WHERE id=? AND type=? AND (status=2 OR status=3)");
             $stmt->bind_param("ds", $electionId, $type);
