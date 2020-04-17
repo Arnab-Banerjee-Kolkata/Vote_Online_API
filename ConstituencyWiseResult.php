@@ -123,7 +123,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt=$conn->prepare("SELECT Constituency_Result.constituency_name, Candidate.name, Candidate.party_name, Party.symbol, Constituency_Result.winner_vote_count FROM Constituency_Result, Candidate, Party WHERE Constituency_Result.state_election_id=3 AND Constituency_Result.winner_candidate_id=Candidate.id AND Party.name=Candidate.party_name");
                 $stmt->bind_param("d", $stateElectionId);
                 $stmt->execute();
-                $stmt->bind_result($constituencyName, $candidateName, $partyName, $partySymbol $voteCount);
+                $stmt->bind_result($constituencyName, $candidateName, $partyName, $partySymbol, $voteCount);
 
                 $results=array();
 
