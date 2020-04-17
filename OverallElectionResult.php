@@ -98,7 +98,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 
         }
 
-        else if(strlen($stateCode)!=0)   //Lok Sabha with state
+        else if(strlen($stateCode)!=0 && $count==1)   //Lok Sabha with state
         {
             $response['validState']=true;
             $stmt->close();
@@ -138,7 +138,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             }
 
         }
-        else        //Lok sabha without state
+        else if(strlen($stateCode)==0)        //Lok sabha without state
         {
             $stmt->close();
             $count=-1;
