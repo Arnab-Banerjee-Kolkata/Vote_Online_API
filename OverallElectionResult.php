@@ -53,6 +53,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $stmt->bind_param("s",$stateCode);
         $stmt->execute();
         $stmt->bind_result($count);
+        $stmt->fetch();
 
 
         if($type=="VIDHAN SABHA")
