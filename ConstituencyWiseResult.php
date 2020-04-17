@@ -74,10 +74,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 $count=-1;
 
-                $stmt=$conn->prepare("SELECT Constituency_Result.constituency_name, Candidate.name, Candidate.party_name, Constituency_Result.winner_vote_count FROM Constituency_Result, Candidate WHERE Constituency_Result.state_election_id=? AND Constituency_Result.winner_candidate_id=Candidate.id");
+                $stmt=$conn->prepare("SELECT Constituency_Result.constituency_name, Candidate.name, Candidate.party_name, Party.symbol, Constituency_Result.winner_vote_count FROM Constituency_Result, Candidate, Party WHERE Constituency_Result.state_election_id=3 AND Constituency_Result.winner_candidate_id=Candidate.id AND Party.name=Candidate.party_name");
                 $stmt->bind_param("d", $electionId);
                 $stmt->execute();
-                $stmt->bind_result($constituencyName, $candidateName, $partyName, $voteCount);
+                $stmt->bind_result($constituencyName, $candidateName, $partyName, $partySymbol, $voteCount);
 
                 $results=array();
 
@@ -87,6 +87,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $result['constituencyName']=$constituencyName;
                     $result['candidateName']=$candidateName;
                     $result['partyName']=$partyName;
+                    $result['partySymbol']=$partySymbol;
                     $result['voteCount']=$voteCount;
                     array_push($results, $result);
                 }
@@ -119,10 +120,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 $count=-1;
 
-                $stmt=$conn->prepare("SELECT Constituency_Result.constituency_name, Candidate.name, Candidate.party_name, Constituency_Result.winner_vote_count FROM Constituency_Result, Candidate WHERE Constituency_Result.state_election_id=? AND Constituency_Result.winner_candidate_id=Candidate.id");
+                $stmt=$conn->prepare("SELECT Constituency_Result.constituency_name, Candidate.name, Candidate.party_name, Party.symbol, Constituency_Result.winner_vote_count FROM Constituency_Result, Candidate, Party WHERE Constituency_Result.state_election_id=3 AND Constituency_Result.winner_candidate_id=Candidate.id AND Party.name=Candidate.party_name");
                 $stmt->bind_param("d", $stateElectionId);
                 $stmt->execute();
-                $stmt->bind_result($constituencyName, $candidateName, $partyName, $voteCount);
+                $stmt->bind_result($constituencyName, $candidateName, $partyName, $partySymbol $voteCount);
 
                 $results=array();
 
@@ -132,6 +133,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $result['constituencyName']=$constituencyName;
                     $result['candidateName']=$candidateName;
                     $result['partyName']=$partyName;
+                    $result['partySymbol']=$partySymbol;
                     $result['voteCount']=$voteCount;
                     array_push($results, $result);
                 }
