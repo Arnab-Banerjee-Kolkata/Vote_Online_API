@@ -62,10 +62,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $response['validState']=true;
             $count=-1;
 
-            $stmt=$conn->prepare("SELECT COUNT(id), status FROM State_Election WHERE id=? AND type=? AND (status=2 OR status=3)");
+            $stmt=$conn->prepare("SELECT COUNT(id), status, state_code FROM State_Election WHERE id=? AND type=? AND (status=2 OR status=3)");
             $stmt->bind_param("ds", $electionId, $type);
             $stmt->execute();
-            $stmt->bind_result($count, $status);
+            $stmt->bind_result($count, $status, $stateCode);
 
             if($stmt->fetch() && $count>=1)
             {
@@ -89,6 +89,16 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $result['partySymbol']=$partySymbol;
                     array_push($results, $result);
                 }
+                $stmt->close();
+
+                $stmt=$conn->prepare("SELECT COUNT(name) FROM Constituency WHERE state_code = ? AND phase_code IN (
+	SELECT code FROM Phase WHERE state_code = ? AND type=?
+)");
+                $stmt->bind_param("sss", $stateCode, $stateCode, $type);
+                $stmt->execute();
+                $stmt->bind_result($response['totalSeats']);
+                $stmt->fetch();
+
                 $stmt->close();
 
                 $response['success']=true;
@@ -135,6 +145,16 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 }
                 $stmt->close();
 
+                $stmt=$conn->prepare("SELECT COUNT(name) FROM Constituency WHERE state_code = ? AND phase_code IN (
+	SELECT code FROM Phase WHERE state_code = ? AND type=?
+)");
+                $stmt->bind_param("sss", $stateCode, $stateCode, $type);
+                $stmt->execute();
+                $stmt->bind_result($response['totalSeats']);
+                $stmt->fetch();
+
+                $stmt->close();                
+
                 $response['success']=true;
 
                 $response['results']=$results;
@@ -173,6 +193,16 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $result['partySymbol']=$partySymbol;
                     array_push($results, $result);
                 }
+                $stmt->close();
+
+                $stmt=$conn->prepare("SELECT COUNT(name) FROM Constituency WHERE phase_code IN (
+	SELECT code FROM Phase WHERE type=?
+)");
+                $stmt->bind_param("s", $type);
+                $stmt->execute();
+                $stmt->bind_result($response['totalSeats']);
+                $stmt->fetch();
+
                 $stmt->close();
 
                 $response['success']=true;
