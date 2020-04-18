@@ -63,7 +63,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $temp['electionId']=$electionId;
         $temp['name']=$name;
         $temp['status']=$status;
-        $temp['type']="LOK SABHA";
+        $temp['type']="VIDHAN SABHA";
         array_push($election, $temp);
     }
     $stmt->close();
