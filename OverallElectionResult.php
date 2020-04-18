@@ -74,10 +74,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 $count=-1;
 
-                $stmt=$conn->prepare("SELECT party_name, seats_won FROM State_Election_Result WHERE state_election_id=?");
+                $stmt=$conn->prepare("SELECT State_Election_Result.party_name, State_Election_Result.seats_won, Party.symbol FROM State_Election_Result, Party WHERE state_election_id=? AND Party.name=State_Election_Result.party_name");
                 $stmt->bind_param("d", $electionId);
                 $stmt->execute();
-                $stmt->bind_result($partyName, $seatsWon);
+                $stmt->bind_result($partyName, $seatsWon, $partySymbol);
 
                 $results=array();
 
@@ -86,6 +86,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $result=array();
                     $result['partyName']=$partyName;
                     $result['seatsWon']=$seatsWon;
+                    $result['partySymbol']=$partySymbol;
                     array_push($results, $result);
                 }
                 $stmt->close();
@@ -117,10 +118,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 $count=-1;
 
-                $stmt=$conn->prepare("SELECT party_name, seats_won FROM State_Election_Result WHERE state_election_id=? AND country_election_id=?");
+                $stmt=$conn->prepare("SELECT State_Election_Result.party_name, State_Election_Result.seats_won, Party.symbol FROM State_Election_Result, Party WHERE State_Election_Result.state_election_id=? AND State_Election_Result.country_election_id=? AND Party.name=State_Election_Result.party_name");
                 $stmt->bind_param("dd", $stateElectionId, $electionId);
                 $stmt->execute();
-                $stmt->bind_result($partyName, $seatsWon);
+                $stmt->bind_result($partyName, $seatsWon, $partySymbol);
 
                 $results=array();
 
@@ -129,6 +130,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $result=array();
                     $result['partyName']=$partyName;
                     $result['seatsWon']=$seatsWon;
+                    $result['partySymbol']=$partySymbol;
                     array_push($results, $result);
                 }
                 $stmt->close();
@@ -156,10 +158,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 $count=-1;
 
-                $stmt=$conn->prepare("SELECT party_name, seats_won FROM Country_Election_Result WHERE country_election_id=?");
+                $stmt=$conn->prepare("SELECT Country_Election_Result.party_name, Country_Election_Result.seats_won, Party.symbol FROM Country_Election_Result, Party WHERE Country_Election_Result.country_election_id=? AND Party.name=Country_Election_Result.party_name");
                 $stmt->bind_param("d", $electionId);
                 $stmt->execute();
-                $stmt->bind_result($partyName, $seatsWon);
+                $stmt->bind_result($partyName, $seatsWon, $partySymbol);
 
                 $results=array();
 
@@ -168,6 +170,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $result=array();
                     $result['partyName']=$partyName;
                     $result['seatsWon']=$seatsWon;
+                    $result['partySymbol']=$partySymbol;
                     array_push($results, $result);
                 }
                 $stmt->close();
