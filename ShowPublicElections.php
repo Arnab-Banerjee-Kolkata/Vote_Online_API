@@ -33,10 +33,9 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt3->close();
     $response['validAuth']=true;
 
-    $stmt=$conn->prepare("SELECT Pub_Govt_Election.id, State.name, Pub_Govt_Election.phase_code, Pub_Govt_Election.type, Pub_Govt_Election.status, Pub_Govt_Election.start_time, Pub_Govt_Election.end_time FROM Pub_Govt_Election, State WHERE Pub_Govt_Election.state_code=State.code ORDER BY Pub_Govt_Election.end_time");
-
+    $stmt=$conn->prepare("SELECT Country_Election.id, Country_Election.name , Country_Election.status FROM Country_Election");
     $stmt->execute();
-    $stmt->bind_result($electionId, $state, $phaseCode, $type, $status, $startTime, $endTime);
+    $stmt->bind_result($electionId, $electionName, $status);
 
     $election=array();
 
@@ -44,18 +43,31 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     {
         $temp=array();
         $temp['electionId']=$electionId;
-        $temp['state']=$state;
-        $temp['phaseCode']=$phaseCode;
-        $temp['type']=$type;
+        $temp['name']=$electionName;
+        $temp['type']="LOK SABHA";
         $temp['status']=$status;
-        $temp['startTime']=$startTime;
-        $temp['endTime']=$endTime;
         array_push($election, $temp);
+        $response['success']=true;
     }
     $stmt->close();
-
-    $response['success']=true;
-
+	
+	
+	$stmt2=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.type, State_Election.status FROM State_Election WHERE State_Election.type='VIDHAN SABHA'");
+	$stmt2->execute();
+	$stmt2->bind_result($electionId, $electionName, $type, $status);
+	
+	while($stmt2->fetch())
+    {
+        $temp2=array();
+        $temp2['electionId']=$electionId;
+        $temp2['name']=$electionName;
+        $temp2['type']=$type;
+        $temp2['status']=$status;
+        array_push($election, $temp2);
+        $response['success']=true;
+	}
+	$stmt2->close();
+	
     $response['elections']=$election;
 
     
@@ -63,6 +75,5 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 $conn->close();
 
 echo json_encode($response);
-
 
 ?>
