@@ -48,6 +48,8 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $temp['status']=$status;
         $temp['type']="LOK SABHA";
         array_push($election, $temp);
+
+        $response['success']=true;
     }
     $stmt->close();
 
@@ -65,10 +67,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $temp['status']=$status;
         $temp['type']="VIDHAN SABHA";
         array_push($election, $temp);
+
+        $response['success']=true;
     }
     $stmt->close();
-
-    $response['success']=true;
 
     $response['elections']=$election;
 
