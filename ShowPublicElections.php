@@ -57,14 +57,14 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 	$stmt2->bind_result($electionId, $electionName, $type, $status);
 	
 	while($stmt2->fetch())
-    {
-        $temp2=array();
-        $temp2['electionId']=$electionId;
-        $temp2['name']=$electionName;
-        $temp2['type']=$type;
-        $temp2['status']=$status;
-        array_push($election, $temp2);
-        $response['success']=true;
+    	{
+		$temp2=array();
+		$temp2['electionId']=$electionId;
+		$temp2['name']=$electionName;
+		$temp2['type']=$type;
+		$temp2['status']=$status;
+		array_push($election, $temp2);
+		$response['success']=true;
 	}
 	$stmt2->close();
 	
