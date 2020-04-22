@@ -70,7 +70,6 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 	
     $response['elections']=$election;
 
-    
 }
 $conn->close();
 
