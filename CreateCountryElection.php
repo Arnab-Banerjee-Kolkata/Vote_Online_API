@@ -32,9 +32,6 @@ $stmt3->bind_param("s", $key_name);
 $stmt3->execute();
 $stmt3->bind_result($postAuthKey2);
 
-$startDT=$startDate." ".$startTime;
-$endDT=$endDate." ".$endTime;
-
 if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 {
     $stmt3->close();
