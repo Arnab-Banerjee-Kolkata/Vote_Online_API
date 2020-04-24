@@ -23,6 +23,7 @@ Clone this to your machine repo with the help of steps from here: https://www.co
 <br>
 2. In your local repo, run the following commands.<br>
 <br>
+      git pull --rebase<br>
       git submodule foreach git pull origin master<br>
-      git commit -am "Your commit message"<br>
+      git commit -am "Your Name | commit message"<br>
       git push origin master<br>
