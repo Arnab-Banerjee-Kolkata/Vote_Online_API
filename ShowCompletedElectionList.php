@@ -33,10 +33,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt3->close();
     $response['validAuth']=true;
 
-    $stmt=$conn->prepare("SELECT id, name, status FROM Country_Election WHERE status= 2 OR status=3");
+    $stmt=$conn->prepare("SELECT id, name, status, year FROM Country_Election WHERE status= 2 OR status=3");
 
     $stmt->execute();
-    $stmt->bind_result($electionId, $name, $status);
+    $stmt->bind_result($electionId, $name, $status, $year);
 
     $election=array();
 
@@ -47,6 +47,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $temp['name']=$name;
         $temp['status']=$status;
         $temp['type']="LOK SABHA";
+        $temp['year']=$year;
         array_push($election, $temp);
 
         $response['success']=true;
@@ -54,10 +55,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt->close();
 
 
-    $stmt=$conn->prepare("SELECT id, name, status FROM State_Election WHERE (status=2 OR status=3) AND (country_election_id IS NULL OR country_election_id='')");
+    $stmt=$conn->prepare("SELECT id, name, status, year FROM State_Election WHERE (status=2 OR status=3) AND (country_election_id IS NULL OR country_election_id='')");
 
     $stmt->execute();
-    $stmt->bind_result($electionId, $name, $status);
+    $stmt->bind_result($electionId, $name, $status, $year);
 
     while($stmt->fetch())
     {
@@ -66,9 +67,8 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $temp['name']=$name;
         $temp['status']=$status;
         $temp['type']="VIDHAN SABHA";
+        $temp['year']=$year;
         array_push($election, $temp);
-
-        $response['success']=true;
     }
     $stmt->close();
 
