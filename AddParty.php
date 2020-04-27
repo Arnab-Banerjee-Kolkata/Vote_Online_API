@@ -13,6 +13,7 @@ if ($conn->connect_error) {
 $postAuthKey1=$_POST["postAuthKey"];
 $name=$_POST["name"];
 $symbol=$_POST["symbol"];
+$boothId=$_POST["boothId"];
 
 
 $key_name="post_auth_key";
@@ -21,6 +22,7 @@ $key_name="post_auth_key";
 $response=array();
 $response['success']=false;
 $response['validAuth']=false;
+$response['validBooth']=false;
 $response['validName']=false;
 $response['validSymbol']=false;
 
@@ -35,38 +37,51 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 {
     $stmt3->close();
     $response['validAuth']=true;
+    
+    
+     $stmt=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=? AND status=1");
+     $stmt->bind_param("s", $boothId);
+     $stmt->execute();
+     $stmt->bind_result($count);
 
-    $stmt=$conn->prepare("SELECT COUNT(name) FROM Party WHERE name=?");
-
-    $stmt->bind_param("s", $name);
-    $stmt->execute();
-    $stmt->bind_result($count);
-
-    if($stmt->fetch() && $count==0)
-    {
+     if($stmt->fetch() && $count==1)
+     {
         $count=-1;
         $stmt->close();
-        $response['validName']=true;
+        $response['validBooth']=true;
+    
 
-        $stmt=$conn->prepare("SELECT COUNT(name) FROM Party WHERE symbol=?");
-        $stmt->bind_param("s", $symbol);
+        $stmt=$conn->prepare("SELECT COUNT(name) FROM Party WHERE name=?");
+
+        $stmt->bind_param("s", $name);
         $stmt->execute();
         $stmt->bind_result($count);
 
         if($stmt->fetch() && $count==0)
-        {        
+        {
+            $count=-1;
             $stmt->close();
-            $response['validSymbol']=true;
+            $response['validName']=true;
 
-            $stmt=$conn->prepare("INSERT INTO Party (name, symbol) VALUES (?, ?)");
-            $stmt->bind_param("ss", $name, $symbol);
+            $stmt=$conn->prepare("SELECT COUNT(name) FROM Party WHERE symbol=?");
+            $stmt->bind_param("s", $symbol);
             $stmt->execute();
-            
-            
-            $response['success']=true;            
+            $stmt->bind_result($count);
+
+            if($stmt->fetch() && $count==0)
+            {        
+                $stmt->close();
+                $response['validSymbol']=true;
+
+                $stmt=$conn->prepare("INSERT INTO Party (name, symbol) VALUES (?, ?)");
+                $stmt->bind_param("ss", $name, $symbol);
+                $stmt->execute();
+
+
+                $response['success']=true;            
+            }
         }
-    }
-    
+     }
 
     
 }
