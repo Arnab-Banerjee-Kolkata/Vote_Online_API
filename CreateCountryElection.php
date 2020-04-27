@@ -13,6 +13,7 @@ if ($conn->connect_error) {
 $postAuthKey1=$_POST["postAuthKey"];
 $electionName=$_POST["electionName"];
 $electionYear=$_POST["electionYear"];
+$boothId=$_POST["boothId"];
 
 
 $key_name="post_auth_key";
@@ -21,6 +22,7 @@ $key_name="post_auth_key";
 $response=array();
 $response['success']=false;
 $response['validAuth']=false;
+$response['validBooth']]=false;
 $response['validName']=false;
 $response['validYear']=false;
 $response['validElection']=false;
@@ -37,53 +39,64 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt3->close();
     $response['validAuth']=true;
 
+    
+    $stmt=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=? AND status=1");
+    $stmt->bind_param("s", $boothId);
+    $stmt->execute();
+    $stmt->bind_result($count);
 
-    $electionName=trim($electionName);
-    $electionName=strtoupper($electionName);
-
-    if(strlen($electionName)!=0 && ctype_alpha($electionName[0]))   //Has to start with a letter
+    if($stmt->fetch() && $count==1)
     {
-        $response['validName']=true;
+        $count=-1;
+        $stmt->close();
+        $response['validBooth']=true;
 
-        $currentYear=date("Y");
+        $electionName=trim($electionName);
+        $electionName=strtoupper($electionName);
 
-        if($electionYear>=$currentYear)     //Cannot be less than present year
+        if(strlen($electionName)!=0 && ctype_alpha($electionName[0]))   //Has to start with a letter
         {
-            $response['validYear']=true;
+            $response['validName']=true;
 
-            $stmt=$conn->prepare("SELECT COUNT(id) FROM Country_Election WHERE name = ? AND year = ?");
+            $currentYear=date("Y");
 
-            $stmt->bind_param("sd", $electionName, $electionYear);
-            $stmt->execute();
-            $stmt->bind_result($count);
-
-            if($stmt->fetch() && $count==0)
+            if($electionYear>=$currentYear)     //Cannot be less than present year
             {
-                $stmt->close();
-                $count=-1;
-                $response['validElection']=true;
+                $response['validYear']=true;
 
-                $stmt=$conn->prepare("INSERT INTO Country_Election (name, status, year) VALUES (?, 0, ?)");
+                $stmt=$conn->prepare("SELECT COUNT(id) FROM Country_Election WHERE name = ? AND year = ?");
+
                 $stmt->bind_param("sd", $electionName, $electionYear);
                 $stmt->execute();
-                
-                $stmt->close();
+                $stmt->bind_result($count);
 
-                $stmt=$conn->prepare("SELECT id FROM Country_Election WHERE name = ? AND year= ?");
-                $stmt->bind_param("sd", $electionName, $electionYear);
-                $stmt->execute();
-                $stmt->bind_result($response['electionId']);
-                $stmt->fetch();
-                $stmt->close();
+                if($stmt->fetch() && $count==0)
+                {
+                    $stmt->close();
+                    $count=-1;
+                    $response['validElection']=true;
 
-                if($response['electionId']!=-1)
-                    $response['success']=true;
+                    $stmt=$conn->prepare("INSERT INTO Country_Election (name, status, year) VALUES (?, 0, ?)");
+                    $stmt->bind_param("sd", $electionName, $electionYear);
+                    $stmt->execute();
+
+                    $stmt->close();
+
+                    $stmt=$conn->prepare("SELECT id FROM Country_Election WHERE name = ? AND year= ?");
+                    $stmt->bind_param("sd", $electionName, $electionYear);
+                    $stmt->execute();
+                    $stmt->bind_result($response['electionId']);
+                    $stmt->fetch();
+                    $stmt->close();
+
+                    if($response['electionId']!=-1)
+                        $response['success']=true;
+                }
             }
-        }
-    
-    }
 
-    
+        }
+
+    }
 }
 $conn->close();
 
