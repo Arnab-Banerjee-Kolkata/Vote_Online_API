@@ -12,6 +12,10 @@
     voter: When voter's OTP is needed to be validated from Remote Polling Device<br>
     booth: When booth's OTP is needed to be validated from Voter's device<br>
 <br>
+<b>Booth status::</b><br><br>
+    0: Logged out<br>
+    1: Logged in<br>
+<br>
 <br>
 <br>
 <b>INSTRUCTIONS TO CLONE THIS REPO</b><br>
