@@ -65,7 +65,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
                 $response['validType']=true;
                 
                 $stmt4=$conn->prepare("SELECT COUNT(aadhaar_no) FROM Govt_Approval where election_id = ? AND aadhaar_no = ?");
-                $stmt4->bind_param("ss",$electionId,$aadhaarNo);
+                $stmt4->bind_param("ds",$electionId,$aadhaarNo);
                 
                 $stmt4->execute();
                 $stmt4->bind_result($count2);
@@ -83,10 +83,6 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
                     $stmt4->close();
                 }
             }
-            else
-            {
-                $response['validElection']=false;
-            }
         }
         else
         {
@@ -99,7 +95,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			
 		$stmt3->execute();
 		$stmt3->bind_result($status2);
-			
+		$response['validElection']=false;	
         if($stmt3->fetch() && $status2==1)
         {
             $stmt3->close();
@@ -110,7 +106,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 				$response['validType']=true;
 				
 				$stmt4=$conn->prepare("SELECT COUNT(aadhaar_no) FROM Govt_Approval where election_id = ? AND aadhaar_no = ?");
-				$stmt4->bind_param("ss",$electionId,$aadhaarNo);
+				$stmt4->bind_param("ds",$electionId,$aadhaarNo);
 				
 				$stmt4->execute();
 				$stmt4->bind_result($count3);
@@ -122,7 +118,15 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 					$response['validApproval']=true;
 					$response['success']=true;
 				}
+                else
+                {
+                    $stmt4->close();
+                }
 			}
+        }
+        else
+        {
+            $stmt3->close();
         }
 	  end:
 	}
