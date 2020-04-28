@@ -46,52 +46,65 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 	if($stmt2->fetch() && $count1==1)
 	{
 		$stmt2->close();
-		$count=-1;
+		$count1=-1;
 		$response['validAadhaar']=true;
-		
+		//Country Election
 		$stmt3=$conn->prepare("SELECT status FROM Country_Election where id = ?");
-		$stmt3->bind_param("s",$electionId);
+		$stmt3->bind_param("d",$electionId);
 			
 		$stmt3->execute();
 		$stmt3->bind_result($status1);
 
 		if($stmt3->fetch() && $status1==1)
-    {
-      $stmt3->close();
-      $response['validElection']=true;
-				
-			if($type=="LOK SABHA")
-			{
-				$response['validType']=true;
-				
-				$stmt4=$conn->prepare("SELECT COUNT(aadhaar_no) FROM Govt_Approval where election_id = ? AND aadhaar_no = ?");
-				$stmt4->bind_param("ss",$electionId,$aadhaarNo);
-				
-				$stmt4->execute();
-				$stmt4->bind_result($count2);
-				
-				if($stmt4->fetch() && $count2==1);
-				{
-					$stmt4->close();
-					$count2=-1;
-					$response['validApproval']=true;
-					$response['success']=true;
-					goto end;
-				}
-			}
-    }
-			
+        {
+            $stmt3->close();
+            $response['validElection']=true;
+                    
+            if($type=="LOK SABHA")
+            {
+                $response['validType']=true;
+                
+                $stmt4=$conn->prepare("SELECT COUNT(aadhaar_no) FROM Govt_Approval where election_id = ? AND aadhaar_no = ?");
+                $stmt4->bind_param("ss",$electionId,$aadhaarNo);
+                
+                $stmt4->execute();
+                $stmt4->bind_result($count2);
+                
+                if($stmt4->fetch() && $count2==1)
+                {
+                    $stmt4->close();
+                    $count2=-1;
+                    $response['validApproval']=true;
+                    $response['success']=true;
+                    goto end;
+                }
+                else
+                {
+                    $stmt4->close();
+                }
+            }
+            else
+            {
+                $response['validElection']=false;
+            }
+        }
+        else
+        {
+            $stmt3->close();
+        }
+		
+
 		$stmt3=$conn->prepare("SELECT status FROM State_Election where id = ?");
-		$stmt3->bind_param("s",$electionId);
+		$stmt3->bind_param("d",$electionId);
 			
 		$stmt3->execute();
 		$stmt3->bind_result($status2);
 			
-    if($stmt3->fetch() && $status2==1)
-    {
-      $stmt3->close();
-      $response['validElection']=true;
-			
+        if($stmt3->fetch() && $status2==1)
+        {
+            $stmt3->close();
+            $response['validElection']=true;
+			//State Election
 			if($type=="VIDHAN SABHA")
 			{
 				$response['validType']=true;
@@ -102,7 +115,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 				$stmt4->execute();
 				$stmt4->bind_result($count3);
 				
-				if($stmt4->fetch() && $count3==1);
+				if($stmt4->fetch() && $count3==1)
 				{
 					$stmt4->close();
 					$count3=-1;
@@ -110,7 +123,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 					$response['success']=true;
 				}
 			}
-    }
+        }
 	  end:
 	}
 }
