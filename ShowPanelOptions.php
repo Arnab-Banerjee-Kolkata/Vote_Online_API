@@ -178,7 +178,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		}
         else
         {
-            $stmt2->close();
+		$stmt2->close();
         }
 	}
 	else
