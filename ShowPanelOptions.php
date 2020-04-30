@@ -77,39 +77,6 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 				{
 					$response['validType']=true;
 					
-					//phaseElectionId starts here
-					
-					$stmt5=$conn->prepare("SELECT lok_sabha_constituency FROM Govt_DB WHERE aadhaar_no = ?");
-					$stmt5->bind_param("s",$aadhaarNo);
-					$stmt5->execute();
-					$stmt5->bind_result($ls_const);
-                    			$stmt5->fetch();
-					$stmt5->close();
-					
-					$stmt6=$conn->prepare("SELECT phase_code,state_code FROM Constituency WHERE name = ?");
-					$stmt6->bind_param("s",$ls_const);
-					$stmt6->execute();
-					$stmt6->bind_result($p_code,$s_code);
-                    			$stmt6->fetch();
-					$stmt6->close();
-					
-					$stmt7=$conn->prepare("SELECT id FROM State_Election WHERE state_code = ? AND status = 1 AND country_election_id = ?");
-					$stmt7->bind_param("ss",$s_code,$electionId);
-					$stmt7->execute();
-					$stmt7->bind_result($s_id);
-                    			$stmt7->fetch();
-					$stmt7->close();
-					
-					$stmt8=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE state_election_id = ? AND phase_code = ? AND status = 1");
-					$stmt8->bind_param("ds",$s_id,$p_code);
-					$stmt8->execute();
-					$stmt8->bind_result($p_id);
-                    			$stmt8->fetch();
-					$stmt8->close();
-					
-					$response['phaseElectionId']=$p_id;
-					//phaseElectionId ends here
-                
 					$stmt4=$conn->prepare("SELECT COUNT(aadhaar_no) FROM Govt_Approval where election_id = ? AND aadhaar_no = ?");
 					$stmt4->bind_param("ds",$electionId,$aadhaarNo);
                 
@@ -121,6 +88,40 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 						$stmt4->close();
 						$count2=-1;
 						$response['validApproval']=true;
+					
+						//phaseElectionId starts here
+					
+						$stmt5=$conn->prepare("SELECT lok_sabha_constituency FROM Govt_DB WHERE aadhaar_no = ?");
+						$stmt5->bind_param("s",$aadhaarNo);
+						$stmt5->execute();
+						$stmt5->bind_result($ls_constituency);
+						$stmt5->fetch();
+						$stmt5->close();
+					
+						$stmt6=$conn->prepare("SELECT phase_code,state_code FROM Constituency WHERE name = ?");
+						$stmt6->bind_param("s",$ls_constituency);
+						$stmt6->execute();
+						$stmt6->bind_result($phasecode,$statecode);
+						$stmt6->fetch();
+						$stmt6->close();
+					
+						$stmt7=$conn->prepare("SELECT id FROM State_Election WHERE state_code = ? AND status = 1 AND country_election_id = ?");
+						$stmt7->bind_param("ss",$statecode,$electionId);
+						$stmt7->execute();
+						$stmt7->bind_result($stateid);
+						$stmt7->fetch();
+						$stmt7->close();
+					
+						$stmt8=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE state_election_id = ? AND phase_code = ? AND status = 1");
+						$stmt8->bind_param("ds",$stateid,$phasecode);
+						$stmt8->execute();
+						$stmt8->bind_result($phaseid);
+						$stmt8->fetch();
+						$stmt8->close();
+					
+						$response['phaseElectionId']=$phaseid;
+						//phaseElectionId ends here
+
 						$response['success']=true;
 						goto end;
 					}
@@ -178,7 +179,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		}
         else
         {
-		$stmt2->close();
+            $stmt2->close();
         }
 	}
 	else
