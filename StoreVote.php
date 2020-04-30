@@ -1,4 +1,5 @@
 <?php
+//Removes approval, removes nota and adds vote.
 
 include 'Credentials.php';
 
@@ -102,7 +103,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 
 
-                if($count1+1==$count2)
+                if($count1==$count2)
                 {
                     $count1=-1;
                     $count2=-1;
@@ -132,6 +133,13 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                         $stmt->fetch();
                         $stmt->close();
                         
+                        
+                        $nota="NOTA";
+                        $stmt=$conn->prepare("DELETE FROM Govt_Vote WHERE phase_election_id=? AND en_vote=? LIMIT 1");
+                        $stmt->bind_param("ds", $phaseElectionId, $nota);
+                        $stmt->execute();                        
+                        $stmt->fetch();
+                        $stmt->close();
                         
 
                         $stmt=$conn->prepare("INSERT INTO Govt_Vote (phase_election_id, en_vote) VALUES (?, ?)");
