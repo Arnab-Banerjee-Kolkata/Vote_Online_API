@@ -49,7 +49,16 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $response['validBooth']=true;
 
         $KEY_SET_SIZE=sizeof($keySet);
-        $setNo=mt_rand(0,$KEY_SET_SIZE-1);
+
+        $setNo=0;
+
+        $times=mt_rand(1,8);
+        while($times>0)
+        {
+            $setNo=mt_rand(0, mt_rand(1,$KEY_SET_SIZE-1));
+            $times--;
+        }
+        
         $response['setNo']=$setNo;
         $response['keySet']=$keySet[$setNo];
         
