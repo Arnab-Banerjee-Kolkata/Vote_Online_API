@@ -76,10 +76,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         }                
         
         
-        $times=rand(1,12);
+        $times=mt_rand(1,12);
         while($times>0)
         {
-            $otp=rand(1000, rand(1001,9999));
+            $otp=mt_rand(1000, mt_rand(1001,9999));
             $times--;
         }
         $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
