@@ -88,8 +88,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 						$stmt4->close();
 						$count2=-1;
 						$response['validApproval']=true;
-					
-						//phaseElectionId starts here
+
+                        			//phaseElectionId starts here
 					
 						$stmt5=$conn->prepare("SELECT lok_sabha_constituency FROM Govt_DB WHERE aadhaar_no = ?");
 						$stmt5->bind_param("s",$aadhaarNo);
@@ -113,14 +113,14 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 						$stmt7->close();
 					
 						$stmt8=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE state_election_id = ? AND phase_code = ? AND status = 1");
-						$stmt8->bind_param("ds",$stateid,$phasecode);
+				   		$stmt8->bind_param("ds",$stateid,$phasecode);
 						$stmt8->execute();
 						$stmt8->bind_result($phaseid);
-						$stmt8->fetch();
-						$stmt8->close();
+      						$stmt8->fetch();
+				    		$stmt8->close();
 					
-						$response['phaseElectionId']=$phaseid;
-						//phaseElectionId ends here
+    						$response['phaseElectionId']=$phaseid;
+	    					//phaseElectionId ends here
 
 						$response['success']=true;
 						goto end;
@@ -163,6 +163,33 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 						$stmt4->close();
 						$count3=-1;
 						$response['validApproval']=true;
+						
+						//phaseElectionId starts here
+						
+						$stmt5=$conn->prepare("SELECT vidhan_sabha_constituency FROM Govt_DB WHERE aadhaar_no = ?");
+						$stmt5->bind_param("s",$aadhaarNo);
+						$stmt5->execute();
+						$stmt5->bind_result($vs_constituency);
+						$stmt5->fetch();
+						$stmt5->close();
+						
+						$stmt6=$conn->prepare("SELECT phase_code FROM Constituency WHERE name = ?");
+						$stmt6->bind_param("s",$vs_constituency);
+						$stmt6->execute();
+						$stmt6->bind_result($phasecode);
+						$stmt6->fetch();
+						$stmt6->close();
+						
+						$stmt7=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE state_election_id = ? AND phase_code = ? AND status = 1");
+						$stmt7->bind_param("ds",$electionId,$phasecode);
+						$stmt7->execute();
+						$stmt7->bind_result($phaseid);
+						$stmt7->fetch();
+						$stmt7->close();
+						
+						$response['phaseElectionId']=$phaseid;
+						//phaseElectionId ends here
+						
 						$response['success']=true;
 					}
 					else
