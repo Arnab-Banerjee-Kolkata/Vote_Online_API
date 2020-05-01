@@ -115,8 +115,8 @@ SELECT aadhaar_no FROM Govt_DB WHERE lok_sabha_constituency=? OR vidhan_sabha_co
                 $stmt->close();
 
 
-                $stmt=$conn->prepare("INSERT INTO Govt_Vote (phase_election_id, en_vote) VALUES (?, ?)");
-                $stmt->bind_param("ds", $phaseElectionId, $enVote);
+                $stmt=$conn->prepare("INSERT INTO Govt_Vote (phase_election_id, en_vote, constituency_name) VALUES (?, ?, ?)");
+                $stmt->bind_param("dss", $phaseElectionId, $enVote, $constituencyName);
                 $stmt->execute();
                 $stmt->fetch();
                 $stmt->close();               
