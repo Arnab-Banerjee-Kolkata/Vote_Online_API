@@ -60,7 +60,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$stmt3->bind_param("s",$aadhaarNo);
 			$stmt3->execute();
 			$stmt3->bind_result($imagePath);
-            $stmt3->fetch();
+			$stmt3->fetch();
 			$stmt3->close();
 			
 			$response["imagePath"]=$imagePath;
