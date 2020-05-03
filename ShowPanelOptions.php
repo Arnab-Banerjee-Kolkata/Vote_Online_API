@@ -106,17 +106,37 @@ function showPanelOptions($internalAuthKey, $conn, $boothId, $electionId, $type)
         
         if($response['validParentElection'])
         {
-            $stmt=$conn->prepare("SELECT election_id FROM Govt_Approval WHERE booth_id=?");
+            $stmt=$conn->prepare("SELECT election_id, constituency_name FROM Govt_Approval WHERE booth_id=?");
             $stmt->bind_param("s", $boothId);
             $stmt->execute();
-            $stmt->bind_result($phaseElectionId);
+            $stmt->bind_result($phaseElectionId, $constituencyName);
             $stmt->fetch();
             $stmt->close();
 
-            $response['phaseId']=$phaseElectionId;
+            
             
             //FETCH PANEL MEMBERS
             
+            $stmt=$conn->prepare("SELECT id, name, party_name, img FROM Candidate WHERE election_id=? AND constituency_name=?");
+            $stmt->bind_param("ds", $phaseElectionId, $constituencyName);
+            $stmt->execute();
+            $stmt->bind_result($canId, $canName, $canParty, $canImg);
+            
+            $candidates=array();
+            
+            while($stmt->fetch())
+            {
+                $candidate=array();
+                $candidate['id']=$canId;
+                $candidate['name']=$canName;
+                $candidate['party']=$canParty;
+                $candidate['img']=$canImg;
+                
+                array_push($candidates, $candidate);
+            }
+            $stmt->close();
+            
+            $response['candidates']=$candidates;
             $response['success']=true;
         }
             
