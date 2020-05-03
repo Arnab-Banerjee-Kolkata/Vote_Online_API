@@ -36,7 +36,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 	$stmt1->execute();
 	$stmt1->bind_result($count1);
 	
-	if($stmt1->fetch && $count1==1)
+	if($stmt1->fetch() && $count1==1)
 	{
 		$stmt1->close();
 		$count1=-1;
@@ -71,7 +71,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		}
 		
 		$stmt3=$conn->prepare("UPDATE Admin_Credentials SET OTP=? WHERE id=?");
-		$stmt3->bind_param("d",$otp1);
+		$stmt3->bind_param("ds",$otp1,$adminId);
 		$stmt3->execute();
 		$stmt3->close();
 	}
