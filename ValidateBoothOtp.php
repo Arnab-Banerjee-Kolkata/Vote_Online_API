@@ -1,6 +1,7 @@
 <?php
 
 include 'Credentials.php';
+include 'ShowPanelOptions.php';
 
 
 // Create connection
@@ -22,10 +23,12 @@ $key_name="post_auth_key";
 
 
 $response=array();
-$response['success']=false;
 $response['validAuth']=false;
 $response['validBooth']=false;
 $response['validOtp']=false;
+$response['validType']=false;
+$response['validElection']=false;
+$response['validParentElection']=false;
 
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name = ?");
@@ -63,12 +66,14 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         if($stmt->fetch() && $otp1==$otp2)
         {                     
             $stmt->close();
-            $response['validOtp']=true;     
+            $response['validOtp']=true; 
+            
+            
             
             //SHOW APPROPRIATE VOTING PANEL
+            $response['sub']=showPanelOptions($INTERNAL_AUTH_KEY, $conn, $boothId, $electionId, $type);
 
-
-            $response['success']=true;             
+             
         }    
         else
         {
