@@ -26,9 +26,6 @@ $response=array();
 $response['validAuth']=false;
 $response['validBooth']=false;
 $response['validOtp']=false;
-$response['validType']=false;
-$response['validElection']=false;
-$response['validParentElection']=false;
 
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name = ?");
