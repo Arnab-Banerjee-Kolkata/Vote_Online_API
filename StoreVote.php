@@ -25,6 +25,7 @@ $response['validAuth']=false;
 $response['validBooth']=false;
 $response['validIntegrity']=false;
 $response['validApproval']=false;
+$response['deleteApproval']=false;
 
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
@@ -106,22 +107,26 @@ SELECT aadhaar_no FROM Govt_DB WHERE lok_sabha_constituency=? OR vidhan_sabha_co
                 $stmt->fetch();
                 $stmt->close();
 
+                if($conn->affected_rows == 1)
+                {
+                    $response['deleteApproval']=true;
 
-                $nota="NOTA";
-                $stmt=$conn->prepare("DELETE FROM Govt_Vote WHERE phase_election_id=? AND en_vote=? LIMIT 1");
-                $stmt->bind_param("ds", $phaseElectionId, $nota);
-                $stmt->execute();                        
-                $stmt->fetch();
-                $stmt->close();
+                    $nota="NOTA";
+                    $stmt=$conn->prepare("DELETE FROM Govt_Vote WHERE phase_election_id=? AND en_vote=? LIMIT 1");
+                    $stmt->bind_param("ds", $phaseElectionId, $nota);
+                    $stmt->execute();                        
+                    $stmt->fetch();
+                    $stmt->close();
 
 
-                $stmt=$conn->prepare("INSERT INTO Govt_Vote (phase_election_id, en_vote, constituency_name) VALUES (?, ?, ?)");
-                $stmt->bind_param("dss", $phaseElectionId, $enVote, $constituencyName);
-                $stmt->execute();
-                $stmt->fetch();
-                $stmt->close();               
+                    $stmt=$conn->prepare("INSERT INTO Govt_Vote (phase_election_id, en_vote, constituency_name) VALUES (?, ?, ?)");
+                    $stmt->bind_param("dss", $phaseElectionId, $enVote, $constituencyName);
+                    $stmt->execute();
+                    $stmt->fetch();
+                    $stmt->close();               
 
-                $response['success']=true;
+                    $response['success']=true;
+                }
             }
         }
         
