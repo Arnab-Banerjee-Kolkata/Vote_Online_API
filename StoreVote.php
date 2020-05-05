@@ -103,11 +103,12 @@ SELECT aadhaar_no FROM Govt_DB WHERE lok_sabha_constituency=? OR vidhan_sabha_co
 
                 $stmt=$conn->prepare("DELETE FROM Govt_Approval WHERE booth_id=? AND election_id=?");
                 $stmt->bind_param("sd", $boothId, $phaseElectionId);
-                $stmt->execute();                        
+                $stmt->execute(); 
+                $deletedRows= $conn->affected_rows;                      
                 $stmt->fetch();
                 $stmt->close();
 
-                if($conn->affected_rows == 1)
+                if($deletedRows == 1)
                 {
                     $response['deleteApproval']=true;
 
