@@ -3,6 +3,7 @@
 // Shows declared constituencies list and to be declared list
 
 include 'Credentials.php';
+include 'StoreResult.php';
 
 //ini_set('display_errors', 1);
 
@@ -191,7 +192,11 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $response['validResult']=true;
             
             //ADD to RESULT
+            $result=array();
+            $result=storeResult($INTERNAL_AUTH_KEY, $conn, $countryElectionId, $stateElectionId, $phaseElectionId, $type, $constituencyName);
             
+            
+            $response['sub']=$result;            
             $response['success']=true;
         }
              
