@@ -9,7 +9,7 @@ if($conn->connect_error){
 }
 
 $postAuthKey=$_POST["postAuthKey"];
-$booth_id=$_POST["booth_id"];
+$booth_id=$_POST["boothId"];
 $otp=$_POST["otp"];
 
 $key_name="post_auth_key";
@@ -30,16 +30,20 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 	$stmt->close();
 	$response['validAuth']=true;
 	
-	$stmt2=$conn->prepare("SELECT booth_id FROM Booth WHERE booth_id=?");
+	$stmt2=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=?");
 	$stmt2->bind_param("s",$booth_id);
 	$stmt2->execute();
-	$stmt2->bind_result($boothid);
+	$stmt2->bind_result($count);
+    $stmt2->fetch();
+    $stmt2->close();
+    
+
 	
 	
-	if($stmt2->fetch() && $booth_id==$boothid)
+	if($count==1)
 	{
-		$stmt2->close();
 		$response['validBooth']=true;
+        $count=-1;
 
         $stmt=$conn->prepare("SELECT status FROM Booth WHERE booth_id=?");
         $stmt->bind_param("s", $booth_id);
@@ -85,6 +89,3 @@ $conn->close();
 echo json_encode($response);
 
 ?>
-			
-	
-	
