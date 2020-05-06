@@ -20,8 +20,8 @@ $key_name="post_auth_key";
 $response=array();
 $response['validAuth']=false;
 $response['validAdmin']=false;
-$response['validElection']=false;
 $response['validType']=false;
+$response['validElection']=false;
 $response['validStatus']=false;
 $response['success']=false;
 
@@ -35,7 +35,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 	$stmt->close();
 	$response['validAuth']=true;
 	
-	$stmt1=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=?");
+	$stmt1=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
 	$stmt1->bind_param("s",$adminId);
 	$stmt1->execute();
 	$stmt1->bind_result($count1);
@@ -50,39 +50,28 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		{
 			$response['validType']=true;
 			
-			$stmt2=$conn->prepare("SELECT COUNT(id) FROM Country_Election WHERE id=?");
+			$stmt2=$conn->prepare("SELECT COUNT(id),status FROM Country_Election WHERE id=?");
 			$stmt2->bind_param("d",$electionId);
 			$stmt2->execute();
-			$stmt2->bind_result($count2);
+			$stmt2->bind_result($count2,$currentStatus);
 			
 			if($stmt2->fetch() && $count2==1)
 			{
 				$stmt2->close();
 				$count2=-1;
 				$response['validElection']=true;
-				
-				$stmt3=$conn->prepare("SELECT status FROM Country_Election WHERE id=?");
-				$stmt3->bind_param("d",$electionId);
-				$stmt3->execute();
-				$stmt3->bind_result($currentStatus);
-				$stmt3->fetch();
 					
-				if(($newStatus==($currentStatus+1) && ($newStatus!=3 && $currentStatus!=2))||($newStatus==4 && $currentStatus!=4))
+				if(($newStatus==($currentStatus+1) && $newStatus!=3)||($newStatus==4 && $currentStatus!=4))
 					{
-						$stmt3->close();
 						$response['validStatus']=true;
 						
-						$stmt4=$conn->prepare("UPDATE Country_Election SET status=? WHERE id=?");
-						$stmt4->bind_param("dd",$newStatus,$electionId);
-						$stmt4->execute();
-						$stmt4->fetch();
-						$stmt4->close();
+						$stmt3=$conn->prepare("UPDATE Country_Election SET status=? WHERE id=?");
+						$stmt3->bind_param("dd",$newStatus,$electionId);
+						$stmt3->execute();
+						$stmt3->fetch();
+						$stmt3->close();
 						
 						$response['success']=true;
-					}
-					else
-					{
-						$stmt3->close();
 					}
 			}
 			else
@@ -90,48 +79,37 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 				$stmt2->close();
 			}
 		}
-		else//if($type=="VIDHAN SABHA")
+		elseif($type=="VIDHAN SABHA")
 		{
 			$response['validType']=true;
 			
-			$stmt5=$conn->prepare("SELECT COUNT(id) FROM State_Election WHERE id=?");
-			$stmt5->bind_param("d",$electionId);
-			$stmt5->execute();
-			$stmt5->bind_result($count3);
+			$stmt4=$conn->prepare("SELECT COUNT(id),status FROM State_Election WHERE id=?");
+			$stmt4->bind_param("d",$electionId);
+			$stmt4->execute();
+			$stmt4->bind_result($count3,$currentStatus);
 			
-			if($stmt5->fetch() && $count3==1)
+			if($stmt4->fetch() && $count3==1)
 			{
-				$stmt5->close();
+				$stmt4->close();
 				$count3=-1;
 				$response['validElection']=true;
 				
-				$stmt6=$conn->prepare("SELECT status FROM State_Election WHERE id=?");
-				$stmt6->bind_param("d",$electionId);
-				$stmt6->execute();
-				$stmt6->bind_result($currentStatus);
-				$stmt6->fetch();
-				
-				if(($newStatus==($currentStatus+1) && ($newStatus!=3 && $currentStatus!=2))||($newStatus==4 && $currentStatus!=4))
+				if(($newStatus==($currentStatus+1) && $newStatus!=3)||($newStatus==4 && $currentStatus!=4))
 					{
-						$stmt6->close();
 						$response['validStatus']=true;
 						
-						$stmt7=$conn->prepare("UPDATE State_Election SET status=? WHERE id=?");
-						$stmt7->bind_param("dd",$newStatus,$electionId);
-						$stmt7->execute();
-						$stmt7->fetch();
-						$stmt7->close();
+						$stmt5=$conn->prepare("UPDATE State_Election SET status=? WHERE id=?");
+						$stmt5->bind_param("dd",$newStatus,$electionId);
+						$stmt5->execute();
+						$stmt5->fetch();
+						$stmt5->close();
 						
 						$response['success']=true;
-					}
-					else
-					{
-						$stmt6->close();
 					}
 			}
 			else
 			{
-				$stmt5->close();
+				$stmt4->close();
 			}			
 		}
 	}
