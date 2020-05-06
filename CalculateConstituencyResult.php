@@ -26,7 +26,6 @@ $key_name="post_auth_key";
 
 
 $response=array();
-$response['success']=false;
 $response['validAuth']=false;
 $response['validAdmin']=false;
 $response['validType']=false;
@@ -197,7 +196,6 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             
             
             $response['sub']=$result;            
-            $response['success']=true;
         }
              
         end:
