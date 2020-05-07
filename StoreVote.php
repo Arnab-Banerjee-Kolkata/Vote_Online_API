@@ -5,10 +5,15 @@ include 'Credentials.php';
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
+$vbConn=new mysqli($vbServerName, $vbUserName, $vbPassword, $vbDbName);
 
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
+}
+
+if($vbConn->connect_error){
+    die("Connection failed: " . $vbConn->connect_error);
 }
 
 $postAuthKey1=$_POST["postAuthKey"];
@@ -26,6 +31,7 @@ $response['validBooth']=false;
 $response['validIntegrity']=false;
 $response['validApproval']=false;
 $response['deleteApproval']=false;
+$response['validGarbage']=false;
 
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
@@ -64,7 +70,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 
 
 
-        $stmt=$conn->prepare("SELECT COUNT(en_vote) FROM Govt_Vote WHERE phase_election_id=?");
+        $stmt=$vbConn->prepare("SELECT SUM(count) FROM Govt_Vote WHERE phase_election_id=?");
         $stmt->bind_param("d", $phaseElectionId);
         $stmt->execute();
         $stmt->bind_result($count1);
@@ -86,10 +92,8 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $response['validIntegrity']=true;         
 
 
-            $stmt=$conn->prepare("SELECT COUNT(aadhaar_no) FROM Govt_Approval WHERE booth_id=? AND election_id=? AND aadhaar_no IN (
-SELECT aadhaar_no FROM Govt_DB WHERE lok_sabha_constituency=? OR vidhan_sabha_constituency=?    
-)");
-            $stmt->bind_param("sdss", $boothId, $phaseElectionId, $constituencyName, $constituencyName);
+            $stmt=$conn->prepare("SELECT COUNT(booth_id) FROM Govt_Approval WHERE booth_id=? AND election_id=? AND constituency_name=?");
+            $stmt->bind_param("sds", $boothId, $phaseElectionId, $constituencyName);
             $stmt->execute();
             $stmt->bind_result($count);
             $stmt->fetch();
@@ -111,22 +115,61 @@ SELECT aadhaar_no FROM Govt_DB WHERE lok_sabha_constituency=? OR vidhan_sabha_co
                 if($deletedRows == 1)
                 {
                     $response['deleteApproval']=true;
+                    $deletedRows=-1;
 
-                    $nota="NOTA";
-                    $stmt=$conn->prepare("DELETE FROM Govt_Vote WHERE phase_election_id=? AND en_vote=? LIMIT 1");
-                    $stmt->bind_param("ds", $phaseElectionId, $nota);
-                    $stmt->execute();                        
+                    
+                    $stmt=$vbConn->prepare("SELECT count FROM Govt_Vote WHERE phase_election_id=? AND en_vote=?");
+                    $stmt->bind_param("ds", $phaseElectionId, $garbage);
+                    $stmt->execute();   
+                    $stmt->bind_result($count);
                     $stmt->fetch();
                     $stmt->close();
+                    
+                    if($count>=1)
+                    {
+                        $response['validGarbage']=true;
+                    
+                    
+                        $count--;
+                        $stmt=$vbConn->prepare("UPDATE Govt_Vote SET count=? WHERE en_vote=? AND phase_election_id=?");
+                        $stmt->bind_param("dsd", $count, $garbage, $phaseElectionId);
+                        $stmt->execute();                        
+                        $stmt->fetch();
+                        $stmt->close();
+                        
+                        $count=-1;
+                        
+                        
+                        $stmt=$vbConn->prepare("SELECT count FROM Govt_Vote WHERE phase_election_id=? AND en_vote=?");
+                        $stmt->bind_param("ds", $phaseElectionId, $enVote);
+                        $stmt->execute();   
+                        $stmt->bind_result($count);
+                        $stmt->fetch();
+                        $stmt->close();
+                        
+                        if($count>=1)
+                        {                
+                            $count++;            
+                            $stmt=$vbConn->prepare("UPDATE Govt_Vote SET count=? WHERE phase_election_id=? AND constituency_name=? AND en_vote=?");
+                            $stmt->bind_param("ddss", $count, $phaseElectionId, $constituencyName, $enVote);
+                            $stmt->execute();
+                            $stmt->fetch();
+                            $stmt->close();               
 
+                            $response['success']=true;
+                        }
+                        else
+                        {
 
-                    $stmt=$conn->prepare("INSERT INTO Govt_Vote (phase_election_id, en_vote, constituency_name) VALUES (?, ?, ?)");
-                    $stmt->bind_param("dss", $phaseElectionId, $enVote, $constituencyName);
-                    $stmt->execute();
-                    $stmt->fetch();
-                    $stmt->close();               
+                            $stmt=$vbConn->prepare("INSERT INTO Govt_Vote (phase_election_id, en_vote, constituency_name, count) VALUES (?, ?, ?, 1)");
+                            $stmt->bind_param("dss", $phaseElectionId, $enVote, $constituencyName);
+                            $stmt->execute();
+                            $stmt->fetch();
+                            $stmt->close();               
 
-                    $response['success']=true;
+                            $response['success']=true;
+                        }
+                    }
                 }
             }
         }
@@ -137,6 +180,7 @@ SELECT aadhaar_no FROM Govt_DB WHERE lok_sabha_constituency=? OR vidhan_sabha_co
     
 }
 $conn->close();
+$vbConn->close();
 
 echo json_encode($response);
 
