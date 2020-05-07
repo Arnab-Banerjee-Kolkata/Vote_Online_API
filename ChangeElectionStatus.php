@@ -61,7 +61,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 				$count2=-1;
 				$response['validElection']=true;
 					
-				if(($newStatus==($currentStatus+1) && $newStatus!=3)||($newStatus==4 && $currentStatus!=4))
+				if((($newStatus==($currentStatus+1) && $newStatus!=3)||($newStatus==4 && $currentStatus!=4)) && ($newStatus>=0 && $newStatus<=4))
 					{
 						$response['validStatus']=true;
 						
@@ -94,7 +94,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 				$count3=-1;
 				$response['validElection']=true;
 				
-				if(($newStatus==($currentStatus+1) && $newStatus!=3)||($newStatus==4 && $currentStatus!=4))
+				if((($newStatus==($currentStatus+1) && $newStatus!=3)||($newStatus==4 && $currentStatus!=4)) && ($newStatus>=0 && $newStatus<=4))
 					{
 						$response['validStatus']=true;
 						
