@@ -63,7 +63,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$stmt4->execute();
 			$stmt4->bind_result($count3);
 			
-			if($stmt4->fetch() && $count3!=1)
+			if($stmt4->fetch() && $count3==0)
 			{
 				$stmt4->close();
 				$count3=-1;
@@ -74,7 +74,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 				$stmt5->execute();
 				$stmt5->bind_result($count4);
 				
-				if($stmt5->fetch() && $count4!=1)
+				if($stmt5->fetch() && $count4==0)
 				{
 					$stmt5->close();
 					$count4=-1;
