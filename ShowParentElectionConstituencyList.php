@@ -76,7 +76,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $response['constituencyList']=$constituencyList;
             
             
-            $stmt=$conn->prepare("SELECT constituency_name FROM Constituency_Result WHERE state_election_id IN (
+            $stmt=$conn->prepare("SELECT DISTINCT(constituency_name) FROM Constituency_Result WHERE state_election_id IN (
 	SELECT id FROM State_Election WHERE country_election_id=?    
 )");        $stmt->bind_param("d", $electionId);
             $stmt->execute();
@@ -135,7 +135,8 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $response['constituencyList']=$constituencyList;
             
             
-            $stmt=$conn->prepare("SELECT constituency_name FROM Constituency_Result WHERE state_election_id=?");        $stmt->bind_param("d", $electionId);
+            $stmt=$conn->prepare("SELECT DISTINCT(constituency_name) FROM Constituency_Result WHERE state_election_id=?");        
+            $stmt->bind_param("d", $electionId);
             $stmt->execute();
             $stmt->bind_result($name);
             
