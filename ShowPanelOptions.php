@@ -117,10 +117,10 @@ function showPanelOptions($internalAuthKey, $conn, $boothId, $electionId, $type)
             
             //FETCH PANEL MEMBERS
             
-            $stmt=$conn->prepare("SELECT id, name, party_name, img FROM Candidate WHERE election_id=? AND constituency_name=?");
+            $stmt=$conn->prepare("SELECT Candidate.id, Candidate.name, Candidate.party_name, Candidate.img, Party.symbol FROM Candidate, Party WHERE election_id=? AND constituency_name=? AND Party.name=Candidate.party_name");
             $stmt->bind_param("ds", $phaseElectionId, $constituencyName);
             $stmt->execute();
-            $stmt->bind_result($canId, $canName, $canParty, $canImg);
+            $stmt->bind_result($canId, $canName, $canParty, $canImg, $symbol);
             
             $candidates=array();
             
@@ -131,6 +131,7 @@ function showPanelOptions($internalAuthKey, $conn, $boothId, $electionId, $type)
                 $candidate['name']=$canName;
                 $candidate['party']=$canParty;
                 $candidate['img']=$canImg;
+                $candidate['symbol']=$symbol;
                 
                 array_push($candidates, $candidate);
             }
