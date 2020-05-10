@@ -1,6 +1,7 @@
 <?php
 
 include 'Credentials.php';
+include 'Protection.php';
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -20,6 +21,7 @@ $boothId=$_POST["boothId"];
 
 
 $key_name="post_auth_key";
+$ip=getUserIp();
 
 
 $response=array();
@@ -45,12 +47,12 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $response['validAuth']=true;
     
     
-    $stmt=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=? AND status=1");
-    $stmt->bind_param("s", $boothId);
+    $stmt=$conn->prepare("SELECT COUNT(booth_id), network_address FROM Booth WHERE booth_id=? AND status=1");
+    $stmt->bind_param("ss", $boothId, $network);
     $stmt->execute();
     $stmt->bind_result($count);
 
-    if($stmt->fetch() && $count==1)
+    if($stmt->fetch() && $count==1 && $network==$ip)
     {
         $count=-1;
         $stmt->close();
