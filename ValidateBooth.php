@@ -14,13 +14,14 @@ $booth_id=$_POST["boothId"];
 $otp=$_POST["otp"];
 
 $key_name="post_auth_key";
-$ip=getUserIp();
+
 
 $response=array();
 $response['success']=false;
 $response['validAuth']=false;
 $response['validBooth']=false;
 $response['validLogin']=false;
+
 
 $stmt=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
 $stmt->bind_param("s",$key_name);
@@ -42,7 +43,7 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 
 	
 	
-	if($count==1 && $network==$ip)
+	if($count==1)
 	{
 		$response['validBooth']=true;
         $count=-1;
