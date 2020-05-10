@@ -52,7 +52,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt->execute();
     $stmt->bind_result($count, $network);
 
-    if($stmt->fetch() && $count==1 && $network==$ip)
+    if($stmt->fetch() && $count==1)
     {
         $count=-1;
         $stmt->close();
