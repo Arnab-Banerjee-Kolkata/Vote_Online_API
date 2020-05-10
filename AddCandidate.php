@@ -48,9 +48,9 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     
     
     $stmt=$conn->prepare("SELECT COUNT(booth_id), network_address FROM Booth WHERE booth_id=? AND status=1");
-    $stmt->bind_param("ss", $boothId, $network);
+    $stmt->bind_param("s", $boothId);
     $stmt->execute();
-    $stmt->bind_result($count);
+    $stmt->bind_result($count, $network);
 
     if($stmt->fetch() && $count==1 && $network==$ip)
     {
