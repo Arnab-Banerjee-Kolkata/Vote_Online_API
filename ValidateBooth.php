@@ -1,6 +1,7 @@
 <?php
 
 include 'Credentials.php';
+include 'Protection.php';
 
 $conn=new mysqli($servername,$username,$password,$dbname);
 
@@ -13,6 +14,7 @@ $booth_id=$_POST["boothId"];
 $otp=$_POST["otp"];
 
 $key_name="post_auth_key";
+$ip=getUserIp();
 
 $response=array();
 $response['success']=false;
@@ -30,17 +32,17 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 	$stmt->close();
 	$response['validAuth']=true;
 	
-	$stmt2=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=?");
+	$stmt2=$conn->prepare("SELECT COUNT(booth_id), network_address FROM Booth WHERE booth_id=?");
 	$stmt2->bind_param("s",$booth_id);
 	$stmt2->execute();
-	$stmt2->bind_result($count);
+	$stmt2->bind_result($count, $network);
     $stmt2->fetch();
     $stmt2->close();
     
 
 	
 	
-	if($count==1)
+	if($count==1 && $network==$ip)
 	{
 		$response['validBooth']=true;
         $count=-1;
@@ -89,3 +91,6 @@ $conn->close();
 echo json_encode($response);
 
 ?>
+			
+	
+	
