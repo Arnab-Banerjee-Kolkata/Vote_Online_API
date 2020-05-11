@@ -1,6 +1,7 @@
 <?php
 
 include 'Credentials.php';
+include 'Protection.php';
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -20,6 +21,7 @@ $boothId=$_POST["boothId"];
 
 
 $key_name="post_auth_key";
+checkServerIp($INTERNAL_AUTH_KEY);
 
 
 $response=array();
