@@ -21,7 +21,7 @@ $boothId=$_POST["boothId"];
 
 
 $key_name="post_auth_key";
-$webIp=getServerIp();
+$webIp=getServerIp($INTERNAL_AUTH_KEY);
 
 
 $response=array();
