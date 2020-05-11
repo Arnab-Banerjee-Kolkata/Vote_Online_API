@@ -14,7 +14,7 @@ $booth_id=$_POST["boothId"];
 $otp=$_POST["otp"];
 
 $key_name="post_auth_key";
-$webIp=getUserIp();
+$webIp=getServerIp();
 
 
 $response=array();
