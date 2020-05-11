@@ -1,6 +1,7 @@
 <?php
 
 include 'Credentials.php';
+include 'Protection.php';
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -15,6 +16,7 @@ $boothId=$_POST["boothId"];
 $aadhaarNo=$_POST["aadhaarNo"];
 
 $key_name="post_auth_key";
+checkServerIp($INTERNAL_AUTH_KEY);
 
 $response=array();
 $response['validAuth']=false;
@@ -60,7 +62,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$stmt3->bind_param("s",$aadhaarNo);
 			$stmt3->execute();
 			$stmt3->bind_result($imagePath);
-			$stmt3->fetch();
+            $stmt3->fetch();
 			$stmt3->close();
 			
 			$response["imagePath"]=$imagePath;
@@ -84,3 +86,10 @@ $conn->close();
 echo json_encode($response);
 
 ?>
+
+	
+	
+	
+	
+	
+	
