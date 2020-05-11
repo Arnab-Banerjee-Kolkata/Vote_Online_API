@@ -4,6 +4,7 @@
         require('Credentials.php');
 
     include 'Credentials.php';
+    include 'Protection.php';
 
 function sendOTP($countryCode, $regMobNo, $voterOTP, $API_KEY)
 {
@@ -41,54 +42,75 @@ if ($conn->connect_error) {
 
 $aadhaarNo=$_POST["aadhaarNo"];
 $smsAuthKey1=$_POST["smsAuthKey"];
+$boothId=$_POST["boothId"];
 
-// prepare and bind
-$stmt = $conn->prepare("SELECT country_code, reg_mob_no from Govt_DB where aadhaar_no=?");
-$stmt->bind_param("s", $aadhaarNo);
+checkServerIp($INTERNAL_AUTH_KEY);
+
+
 
 $response=array();
 $response['success']=false;
+$response['validBooth']=false;
 $response['validAadhaar']=false;
 $response['validSmsAuth']=false;
 
+
+$stmt=$conn->prepare("SELECT COUNT(id) FROM Booth WHERE id=? AND status=1");
+$stmt->bind_param("s", $boothId);
 $stmt->execute();
-
-$stmt->bind_result($countryCode, $regMobNo);
-
-if($stmt->fetch())
-{      
-        $stmt->close();
-
-        $stmt2=$conn->prepare("SELECT voter_otp from Credentials where aadhaar_no=?");
-        $stmt2->bind_param("s", $aadhaarNo);
-        
-        $stmt2->execute();
-        $stmt2->bind_result($voterOTP);
-        
-        if($stmt2->fetch())
-        {
-                $stmt2->close();
-                $response['validAadhaar']=true;
-
-                $key_name="sms_auth_key";
-
-                $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
-                $stmt3->bind_param("s", $key_name);
-
-                $stmt3->execute();
-                $stmt3->bind_result($smsAuthKey2);
+$stmt->bind_result($count);
+$stmt->fetch();
+$stmt->close();
 
 
-                if($stmt3->fetch() && $smsAuthKey1==$smsAuthKey2)
-                {
-                    $stmt3->close();
-                    $response['validSmsAuth']=true;
-                
-                    if(sendOTP($countryCode, $regMobNo, $voterOTP, $API_KEY))
-                        $response['success']=true;
-                }
-                
-        }
+if($count==1)
+{
+    $response['validBooth']=true;
+    $count=-1;
+
+    // prepare and bind
+    $stmt = $conn->prepare("SELECT country_code, reg_mob_no from Govt_DB where aadhaar_no=?");
+    $stmt->bind_param("s", $aadhaarNo);
+
+    $stmt->execute();
+
+    $stmt->bind_result($countryCode, $regMobNo);
+
+    if($stmt->fetch())
+    {      
+            $stmt->close();
+
+            $stmt2=$conn->prepare("SELECT voter_otp from Credentials where aadhaar_no=?");
+            $stmt2->bind_param("s", $aadhaarNo);
+            
+            $stmt2->execute();
+            $stmt2->bind_result($voterOTP);
+            
+            if($stmt2->fetch())
+            {
+                    $stmt2->close();
+                    $response['validAadhaar']=true;
+
+                    $key_name="sms_auth_key";
+
+                    $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
+                    $stmt3->bind_param("s", $key_name);
+
+                    $stmt3->execute();
+                    $stmt3->bind_result($smsAuthKey2);
+
+
+                    if($stmt3->fetch() && $smsAuthKey1==$smsAuthKey2)
+                    {
+                        $stmt3->close();
+                        $response['validSmsAuth']=true;
+                    
+                        if(sendOTP($countryCode, $regMobNo, $voterOTP, $API_KEY))
+                            $response['success']=true;
+                    }
+                    
+            }
+    }
 }
 $conn->close();
 
