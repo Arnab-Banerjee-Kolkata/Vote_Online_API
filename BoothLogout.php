@@ -1,6 +1,7 @@
 <?php
 
 include 'Credentials.php';
+include 'Protection.php';
 
 $conn=new mysqli($servername,$username,$password,$dbname);
 
@@ -13,6 +14,7 @@ $booth_id=$_POST["booth_id"];
 
 
 $key_name="post_auth_key";
+$webIp=getServerIp($INTERNAL_AUTH_KEY);
 
 $response=array();
 $response['success']=false;
@@ -24,7 +26,7 @@ $stmt->bind_param("s",$key_name);
 $stmt->execute();
 $stmt->bind_result($postAuthKey2);
 
-if($stmt->fetch() && $postAuthKey==$postAuthKey2)
+if($stmt->fetch() && $postAuthKey==$postAuthKey2 && $webIp==$WEB_IP)
 {
 	$stmt->close();
 	$response['validAuth']=true;
