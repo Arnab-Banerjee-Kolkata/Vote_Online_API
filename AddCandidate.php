@@ -21,7 +21,7 @@ $boothId=$_POST["boothId"];
 
 
 $key_name="post_auth_key";
-$webIp=getServerIp($INTERNAL_AUTH_KEY);
+checkServerIp($INTERNAL_AUTH_KEY);
 
 
 $response=array();
@@ -41,7 +41,7 @@ $stmt3->execute();
 $stmt3->bind_result($postAuthKey2);
 
 
-if($stmt3->fetch() && $postAuthKey1==$postAuthKey2 && $webIp==$WEB_IP)
+if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 {
     $stmt3->close();
     $response['validAuth']=true;
