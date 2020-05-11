@@ -1,6 +1,7 @@
 <?php
 
 include 'Credentials.php';
+include 'Protection.php';
 
 //ini_set('display_errors', 1);
 
@@ -18,6 +19,7 @@ $type=$_POST["type"];
 
 
 $key_name="post_auth_key";
+checkServerIp($INTERNAL_AUTH_KEY);
 
 
 $response=array();
