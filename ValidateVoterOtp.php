@@ -1,6 +1,7 @@
 <?php
 
 include 'Credentials.php';
+include 'StoreApproval.php';
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -14,6 +15,8 @@ $postAuthKey1=$_POST["postAuthKey"];
 $boothId=$_POST["boothId"];
 $aadhaarNo=$_POST["aadhaarNo"];
 $voterOtp=$_POST["voterOtp"];
+$electionId=$_POST["electionId"];
+$type=$_POST["type"];
 
 $key_name="post_auth_key";
 
@@ -89,6 +92,9 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 					{
 						$stmt6->close();
 						$response['validOtp']=true;
+
+                        //StoreApproval
+                        $response['test']=storeApproval($conn,$INTERNAL_AUTH_KEY,$aadhaarNo,$electionId,$type,$boothId);
 						
 						$response['success']=true;
 					}
