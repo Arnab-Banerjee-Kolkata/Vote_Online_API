@@ -14,7 +14,7 @@ $booth_id=$_POST["boothId"];
 $otp=$_POST["otp"];
 
 $key_name="post_auth_key";
-$webIp=getServerIp();
+$webIp=getServerIp($INTERNAL_AUTH_KEY);
 
 
 $response=array();
@@ -93,3 +93,6 @@ $conn->close();
 echo json_encode($response);
 
 ?>
+			
+	
+	
