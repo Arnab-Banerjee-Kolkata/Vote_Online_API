@@ -27,7 +27,6 @@ $response['validAadhaar']=false;
 $response['validVoteStatus']=false;
 $response['validApproval']=false;
 $response['validOtp']=false;
-$response['success']=false;
 
 $stmt=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name=?");
 $stmt->bind_param("s",$key_name);
@@ -95,8 +94,6 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 
                         //StoreApproval
                         $response['test']=storeApproval($conn,$INTERNAL_AUTH_KEY,$aadhaarNo,$electionId,$type,$boothId);
-						
-						$response['success']=true;
 					}
 					else
 					{
