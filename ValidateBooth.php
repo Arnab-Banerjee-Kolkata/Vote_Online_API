@@ -14,6 +14,7 @@ $booth_id=$_POST["boothId"];
 $otp=$_POST["otp"];
 
 $key_name="post_auth_key";
+$webIp=getUserIp();
 
 
 $response=array();
@@ -28,7 +29,7 @@ $stmt->bind_param("s",$key_name);
 $stmt->execute();
 $stmt->bind_result($postAuthKey2);
 
-if($stmt->fetch() && $postAuthKey==$postAuthKey2)
+if($stmt->fetch() && $postAuthKey==$postAuthKey2 && $webIp==$WEB_IP)
 {
 	$stmt->close();
 	$response['validAuth']=true;
@@ -92,6 +93,3 @@ $conn->close();
 echo json_encode($response);
 
 ?>
-			
-	
-	
