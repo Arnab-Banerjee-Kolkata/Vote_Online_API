@@ -5,11 +5,12 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 	include 'Credentials.php';
 	
 	$response=array();
+    	$response['success']=false;
 	$response['validInternalAuth']=false;
 	
 	if($internalAuthKey==$INTERNAL_AUTH_KEY)
-    {
-        $response['validInternalAuth']=true;
+    	{
+        	$response['validInternalAuth']=true;
 		
 		if($type=="VIDHAN SABHA")
 		{
@@ -28,9 +29,8 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt2->fetch();
 			$stmt2->close();
 			
-			$stmt3=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE
-			state_code=? AND phase_code=? AND state_election_id=? AND status=1");
-			$stmt3->bind_param("ssd",$stateCode,$phaseCode,$electionId);
+			$stmt3=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE state_code=? AND phase_code=? AND state_election_id=? AND status=1 AND type=?");
+            		$stmt3->bind_param("ssds",$stateCode,$phaseCode,$electionId,$type);
 			$stmt3->execute();
 			$stmt3->bind_result($phaseId);
 			$stmt3->fetch();
@@ -42,7 +42,8 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt4->execute();
 			$stmt4->close();
 			
-			$response['phaseid']=$phaseId;
+			$response['phaseId']=$phaseId;
+            		$response['success']=true;
 		}
 		elseif($type=="LOK SABHA")
 		{
@@ -60,33 +61,28 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt6->fetch();
 			$stmt6->close();
 			
-			$stmt7=$conn->prepare("SELECT id FROM State_Election WHERE state_code=? AND country_election_id=? AND status=1");
-			$stmt7->bind_param("sd",$stateCode,$electionId);
-			$stmt7->execute();
-			$stmt7->bind_result($stateid);
-			$stmt7->fetch();
-			$stmt7->close();
-			
-			$stmt8=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE state_election_id=? AND status=1");
-			$stmt8->bind_param("d",$stateid);
+			$stmt8=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE Pub_Govt_Election.state_election_id=(SELECT id FROM State_Election WHERE State_Election.state_code=? AND 
+            		State_Election.country_election_id=? AND State_Election.status=1) 
+            		AND Pub_Govt_Election.status=1 AND Pub_Govt_Election.state_code=? AND Pub_Govt_Election.phase_code=? AND Pub_Govt_Election.type=?");
+			$stmt8->bind_param("sdsss",$stateCode,$electionId,$stateCode,$phaseCode,$type);
 			$stmt8->execute();
-			$stmt8->bind_result($id1);
+			$stmt8->bind_result($phaseId);
 			$stmt8->fetch();
 			$stmt8->close();
 			
 			$stmt9=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name)
 			VALUES (?,?,?)");
-			$stmt9->bind_param("dss",$id1,$boothId,$lsConst);
+			$stmt9->bind_param("dss",$phaseId,$boothId,$lsConst);
 			$stmt9->execute();
 			$stmt9->fetch();
 			$stmt9->close();
 			
-			$response['id']=$id1;
+			$response['phaseId']=$phaseId;
+            		$response['success']=true;
 			
 		}
 	}
+    	return $response;
 }
-return $response;
-
 
 ?>
