@@ -1,6 +1,7 @@
 <?php
 
 include 'Credentials.php';
+include 'Protection.php';
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -15,6 +16,7 @@ $boothId=$_POST["boothId"];
 $electionId=$_POST["electionId"];
 
 $key_name="post_auth_key";
+checkServerIp();
 
 $response=array();
 $response['validAuth']=false;
@@ -51,20 +53,20 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		if($stmt3->fetch() && $count2==1)
 		{
 			$stmt3->close();
-      $count2=-1;
+            $count2=-1;
 			$response['validElection']=true;
 			
 			$stmt4=$conn->prepare("DELETE FROM Govt_Approval WHERE election_id=? AND booth_id=?");
 			$stmt4->bind_param("ds",$electionId,$boothId);
 			$stmt4->execute();
 
-      if($conn->affected_rows == 1)
-      {
-        $response['success']=true;
-      }
-      $stmt4->fetch();
-      $stmt4->close();
-    }
+            if($conn->affected_rows == 1)
+            {
+                $response['success']=true;
+            }
+            $stmt4->fetch();
+            $stmt4->close();
+        }
 		else
 		{
 			$stmt3->close();
