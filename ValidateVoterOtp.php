@@ -92,8 +92,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 						$stmt6->close();
 						$response['validOtp']=true;
 
-                        			//StoreApproval
-                        			$response['returnValue']=storeApproval($conn,$INTERNAL_AUTH_KEY,$aadhaarNo,$electionId,$type,$boothId);
+                        //StoreApproval
+                        $response['returnValue']=storeApproval($conn,$INTERNAL_AUTH_KEY,$aadhaarNo,$electionId,$type,$boothId);
 					}
 					else
 					{
