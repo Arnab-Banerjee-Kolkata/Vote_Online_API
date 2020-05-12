@@ -3,13 +3,26 @@
 function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boothId)
 {
 	include 'Credentials.php';
+    include 'Protection.php';
+
     include 'AddGarbageVote.php';
+    include 'Protection.php';
+
+
+
 
     $internalAuthKey=$conn->real_escape_string($internalAuthKey);
     $aadhaarNo=$conn->real_escape_string($aadhaarNo);
     $electionId=$conn->real_escape_string($electionId);
     $type=$conn->real_escape_string($type);
     $boothId=$conn->real_escape_string($boothId);
+    
+    
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $aadhaarNo);
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $electionId);
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $type);
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $boothId);
+    
 	
 	$response=array();
 	$response['validInternalAuth']=false;

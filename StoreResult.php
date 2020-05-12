@@ -5,6 +5,7 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
     include 'Credentials.php';
     include 'EncryptionKeys.php';
     include 'UpdateParentStatus.php';
+    include 'Protection.php';
     
     
     
@@ -16,6 +17,12 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
     $phaseElectionId=$vbConn->real_escape_string($phaseElectionId);
     $type=$vbConn->real_escape_string($type);
     $constituencyName=$vbConn->real_escape_string($constituencyName);
+    
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $countryElectionId);
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $stateElectionId);
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $phaseElectionId);
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $type);
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $constituencyName);
 
     
     if($vbConn->connect_error)

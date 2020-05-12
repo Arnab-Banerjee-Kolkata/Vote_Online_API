@@ -11,6 +11,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
+}
+
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $name=$conn->real_escape_string($_POST["name"]);
 $symbol=$conn->real_escape_string($_POST["symbol"]);

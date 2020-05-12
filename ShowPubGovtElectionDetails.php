@@ -1,6 +1,7 @@
 <?php
 
 include 'Credentials.php';
+include 'Protection.php';
 
 //ini_set('display_errors', 1);
 
@@ -10,6 +11,11 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
+}
+
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
 }
 
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);

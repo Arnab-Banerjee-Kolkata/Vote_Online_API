@@ -2,6 +2,7 @@
 //Removes approval, removes nota and adds vote.
 
 include 'Credentials.php';
+include 'Protection.php';
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -14,6 +15,11 @@ if ($conn->connect_error) {
 
 if($vbConn->connect_error){
     die("Connection failed: " . $vbConn->connect_error);
+}
+
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
 }
 
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);

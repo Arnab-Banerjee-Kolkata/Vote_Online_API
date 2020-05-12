@@ -45,6 +45,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
+}
+
 $aadhaarNo=$conn->real_escape_string($_POST["aadhaarNo"]);
 $smsAuthKey1=$conn->real_escape_string($_POST["smsAuthKey"]);
 $boothId=$conn->real_escape_string($_POST["boothId"]);

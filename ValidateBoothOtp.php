@@ -2,6 +2,7 @@
 
 include 'Credentials.php';
 include 'ShowPanelOptions.php';
+include 'Protection.php';
 
 
 // Create connection
@@ -10,6 +11,11 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
+}
+
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
 }
 
 $boothId=$conn->real_escape_string($_POST["boothId"]);
