@@ -11,10 +11,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$postAuthKey1=$_POST["postAuthKey"];
-$name=$_POST["name"];
-$symbol=$_POST["symbol"];
-$boothId=$_POST["boothId"];
+$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$name=$conn->real_escape_string($_POST["name"]);
+$symbol=$conn->real_escape_string($_POST["symbol"]);
+$boothId=$conn->real_escape_string($_POST["boothId"]);
 
 
 $key_name="post_auth_key";
