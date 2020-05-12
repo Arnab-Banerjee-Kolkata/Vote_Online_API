@@ -3,6 +3,7 @@
 function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boothId)
 {
 	include 'Credentials.php';
+    include 'AddGarbageVote.php';
 
     $internalAuthKey=$conn->real_escape_string($internalAuthKey);
     $aadhaarNo=$conn->real_escape_string($aadhaarNo);
@@ -11,7 +12,6 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
     $boothId=$conn->real_escape_string($boothId);
 	
 	$response=array();
-    $response['success']=false;
 	$response['validInternalAuth']=false;
 	
 	if($internalAuthKey==$INTERNAL_AUTH_KEY)
@@ -36,7 +36,7 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt2->close();
 			
 			$stmt3=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE state_code=? AND phase_code=? AND state_election_id=? AND status=1 AND type=?");
-            $stmt3->bind_param("ssds",$stateCode,$phaseCode,$electionId,$type);
+            		$stmt3->bind_param("ssds",$stateCode,$phaseCode,$electionId,$type);
 			$stmt3->execute();
 			$stmt3->bind_result($phaseId);
 			$stmt3->fetch();
@@ -49,7 +49,7 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt4->close();
 			
 			$response['phaseId']=$phaseId;
-            $response['success']=true;
+			$constName=$vsConst;
 		}
 		elseif($type=="LOK SABHA")
 		{
@@ -84,9 +84,10 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt9->close();
 			
 			$response['phaseId']=$phaseId;
-            $response['success']=true;
+			$constName=$lsConst;
 			
 		}
+		$response['garbageVote']=addGarbageVote($INTERNAL_AUTH_KEY,$constName,$phaseId);
 	}
     return $response;
 }
