@@ -9,9 +9,10 @@ if($conn->connect_error){
 	die("Connection failed ".$conn->connect_error);
 }
 
-$postAuthKey=$_POST["postAuthKey"];
-$booth_id=$_POST["boothId"];
-$otp=$_POST["otp"];
+$postAuthKey=$conn->real_escape_string($_POST["postAuthKey"]);
+$booth_id=$conn->real_escape_string($_POST["boothId"]);
+$otp=$conn->real_escape_string($_POST["otp"]);
+$userIp=$conn->real_escape_string($_POST["userIp"]);
 
 $key_name="post_auth_key";
 checkServerIp($INTERNAL_AUTH_KEY);
@@ -22,6 +23,7 @@ $response['success']=false;
 $response['validAuth']=false;
 $response['validBooth']=false;
 $response['validLogin']=false;
+
 
 
 $stmt=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
@@ -42,9 +44,13 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
     $stmt2->close();
     
 
+	if($userIp==$network && $userIp!=null)
+    {
+        $response["net"]="WORKING";
+        $response["count"]=$count;
+    }
 	
-	
-	if($count==1)
+	if($count==1 )
 	{
 		$response['validBooth']=true;
         $count=-1;
