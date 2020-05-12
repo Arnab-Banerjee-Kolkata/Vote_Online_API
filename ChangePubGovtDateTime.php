@@ -10,10 +10,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$postAuthKey1=$_POST["postAuthKey"];
-$electionId=$_POST["electionId"];
-$startDateTime=$_POST["startDateTime"];
-$endDateTime=$_POST["endDateTime"];
+$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$electionId=$conn->real_escape_string($_POST["electionId"]);
+$startDateTime=$conn->real_escape_string($_POST["startDateTime"]);
+$endDateTime=$conn->real_escape_string($_POST["endDateTime"]);
 
 
 $key_name="post_auth_key";

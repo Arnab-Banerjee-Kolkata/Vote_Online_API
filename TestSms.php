@@ -6,27 +6,32 @@
     include 'Credentials.php';
     include 'Protection.php';
 
-function sendOTP($countryCode, $regMobNo, $voterOTP, $API_KEY)
+function sendOTP($internalAuthKey, $countryCode, $regMobNo, $voterOTP, $API_KEY)
 {
+    include 'Credentials.php';
  
-	$Textlocal = new Textlocal(false, false, $API_KEY);
- 
-	$numbers = array($countryCode.$regMobNo);
-	$sender = 'RMVOTE';
-	$message = 'This is your VOTER OTP: '.$voterOTP;
-        
-        try{
- 
-	$result =$Textlocal->sendSms($numbers, $message, $sender);
-        }catch(Exception $e)
-        {
-                die('Error: '.$e->getMessage());
-        }
+    if($internalAuthKey==$INTERNAL_AUTH_KEY)
+    {
+        $Textlocal = new Textlocal(false, false, $API_KEY);
 
-    if($result->status=="success")
-		return true;
-	else
-		return false;
+        $numbers = array($countryCode.$regMobNo);
+        $sender = 'RMVOTE';
+        $message = 'This is your VOTER OTP: '.$voterOTP;
+
+            try{
+
+        $result =$Textlocal->sendSms($numbers, $message, $sender);
+            }catch(Exception $e)
+            {
+                    die('Error: '.$e->getMessage());
+            }
+
+        if($result->status=="success")
+            return true;
+        else
+            return false;
+    }
+    return false;
 }
 
 
@@ -40,9 +45,9 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$aadhaarNo=$_POST["aadhaarNo"];
-$smsAuthKey1=$_POST["smsAuthKey"];
-$boothId=$_POST["boothId"];
+$aadhaarNo=$conn->real_escape_string($_POST["aadhaarNo"]);
+$smsAuthKey1=$conn->real_escape_string($_POST["smsAuthKey"]);
+$boothId=$conn->real_escape_string($_POST["boothId"]);
 
 checkServerIp($INTERNAL_AUTH_KEY);
 
@@ -105,7 +110,7 @@ if($count==1)
                         $stmt3->close();
                         $response['validSmsAuth']=true;
                     
-                        if(sendOTP($countryCode, $regMobNo, $voterOTP, $API_KEY))
+                        if(sendOTP($INTERNAL_AUTH_KEY, $countryCode, $regMobNo, $voterOTP, $API_KEY))
                             $response['success']=true;
                     }
                     

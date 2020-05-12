@@ -11,9 +11,9 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$postAuthKey1=$_POST["postAuthKey"];
-$boothId=$_POST["boothId"];
-$aadhaarNo=$_POST["aadhaarNo"];
+$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$boothId=$conn->real_escape_string($_POST["boothId"]);
+$aadhaarNo=$conn->real_escape_string($_POST["aadhaarNo"]);
 
 $key_name="post_auth_key";
 checkServerIp($INTERNAL_AUTH_KEY);

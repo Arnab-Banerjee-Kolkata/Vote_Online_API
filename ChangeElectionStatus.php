@@ -10,11 +10,11 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-$postAuthKey1=$_POST["postAuthKey"];
-$adminId=$_POST["adminId"];
-$electionId=$_POST["electionId"];
-$type=$_POST["type"];
-$newStatus=$_POST["newStatus"];
+$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$adminId=$conn->real_escape_string($_POST["adminId"]);
+$electionId=$conn->real_escape_string($_POST["electionId"]);
+$type=$conn->real_escape_string($_POST["type"]);
+$newStatus=$conn->real_escape_string($_POST["newStatus"]);
 
 $key_name="post_auth_key";
 checkServerIp($INTERNAL_AUTH_KEY);

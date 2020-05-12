@@ -3,14 +3,20 @@
 function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boothId)
 {
 	include 'Credentials.php';
+
+    $internalAuthKey=$conn->real_escape_string($internalAuthKey);
+    $aadhaarNo=$conn->real_escape_string($aadhaarNo);
+    $electionId=$conn->real_escape_string($electionId);
+    $type=$conn->real_escape_string($type);
+    $boothId=$conn->real_escape_string($boothId);
 	
 	$response=array();
-    	$response['success']=false;
+    $response['success']=false;
 	$response['validInternalAuth']=false;
 	
 	if($internalAuthKey==$INTERNAL_AUTH_KEY)
-    	{
-        	$response['validInternalAuth']=true;
+    {
+        $response['validInternalAuth']=true;
 		
 		if($type=="VIDHAN SABHA")
 		{
@@ -30,7 +36,7 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt2->close();
 			
 			$stmt3=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE state_code=? AND phase_code=? AND state_election_id=? AND status=1 AND type=?");
-            		$stmt3->bind_param("ssds",$stateCode,$phaseCode,$electionId,$type);
+            $stmt3->bind_param("ssds",$stateCode,$phaseCode,$electionId,$type);
 			$stmt3->execute();
 			$stmt3->bind_result($phaseId);
 			$stmt3->fetch();
@@ -43,7 +49,7 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt4->close();
 			
 			$response['phaseId']=$phaseId;
-            		$response['success']=true;
+            $response['success']=true;
 		}
 		elseif($type=="LOK SABHA")
 		{
@@ -62,8 +68,8 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt6->close();
 			
 			$stmt8=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE Pub_Govt_Election.state_election_id=(SELECT id FROM State_Election WHERE State_Election.state_code=? AND 
-            		State_Election.country_election_id=? AND State_Election.status=1) 
-            		AND Pub_Govt_Election.status=1 AND Pub_Govt_Election.state_code=? AND Pub_Govt_Election.phase_code=? AND Pub_Govt_Election.type=?");
+            State_Election.country_election_id=? AND State_Election.status=1) 
+            AND Pub_Govt_Election.status=1 AND Pub_Govt_Election.state_code=? AND Pub_Govt_Election.phase_code=? AND Pub_Govt_Election.type=?");
 			$stmt8->bind_param("sdsss",$stateCode,$electionId,$stateCode,$phaseCode,$type);
 			$stmt8->execute();
 			$stmt8->bind_result($phaseId);
@@ -78,11 +84,11 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt9->close();
 			
 			$response['phaseId']=$phaseId;
-            		$response['success']=true;
+            $response['success']=true;
 			
 		}
 	}
-    	return $response;
+    return $response;
 }
 
 ?>

@@ -11,12 +11,12 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$category=$_POST["category"];
-$boothId=$_POST["boothId"];
-$otp1=$_POST["otp"];
-$postAuthKey1=$_POST["postAuthKey"];
-$aadhaarNo=$_POST["aadhaarNo"];
-$electionId=$_POST["electionId"];
+$category=$conn->real_escape_string($_POST["category"]);
+$boothId=$conn->real_escape_string($_POST["boothId"]);
+$otp1=$conn->real_escape_string($_POST["otp"]);
+$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$aadhaarNo=$conn->real_escape_string($_POST["aadhaarNo"]);
+$electionId=$conn->real_escape_string($_POST["electionId"]);
 
 
 $key_name="post_auth_key";

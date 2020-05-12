@@ -9,6 +9,14 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
     
     
     $vbConn=new mysqli($vbServerName, $vbUserName, $vbPassword, $vbDbName);
+
+    $internalAuthKey=$vbConn->real_escape_string($internalAuthKey);
+    $countryElectionId=$vbConn->real_escape_string($countryElectionId);
+    $stateElectionId=$vbConn->real_escape_string($stateElectionId);
+    $phaseElectionId=$vbConn->real_escape_string($phaseElectionId);
+    $type=$vbConn->real_escape_string($type);
+    $constituencyName=$vbConn->real_escape_string($constituencyName);
+
     
     if($vbConn->connect_error)
     {

@@ -11,10 +11,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$postAuthKey1=$_POST["postAuthKey"];
-$electionName=$_POST["electionName"];
-$electionYear=$_POST["electionYear"];
-$boothId=$_POST["boothId"];
+$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$electionName=$conn->real_escape_string($_POST["electionName"]);
+$electionYear=$conn->real_escape_string($_POST["electionYear"]);
+$boothId=$conn->real_escape_string($_POST["boothId"]);
 
 
 $key_name="post_auth_key";
@@ -24,7 +24,7 @@ checkServerIp($INTERNAL_AUTH_KEY);
 $response=array();
 $response['success']=false;
 $response['validAuth']=false;
-$response['validBooth']]=false;
+$response['validBooth']=false;
 $response['validName']=false;
 $response['validYear']=false;
 $response['validElection']=false;

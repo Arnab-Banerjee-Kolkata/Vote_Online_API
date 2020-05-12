@@ -10,9 +10,9 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$postAuthKey1=$_POST["postAuthKey"];
-$type=$_POST["type"];
-$countryElectionId=$_POST["countryElectionId"];
+$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$type=$conn->real_escape_string($_POST["type"]);
+$countryElectionId=$conn->real_escape_string($_POST["countryElectionId"]);
 
 
 $key_name="post_auth_key";

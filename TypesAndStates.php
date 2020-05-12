@@ -12,7 +12,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$postAuthKey1=$_POST["postAuthKey"];
+$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 
 
 $key_name="post_auth_key";

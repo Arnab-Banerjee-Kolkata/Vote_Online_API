@@ -5,6 +5,12 @@ function updateParentStatus($internalAuthKey, $conn, $countryElectionId, $stateE
     include 'Credentials.php';
     include 'EncryptionKeys.php';
     
+    $internalAuthKey=$conn->real_escape_string($internalAuthKey);
+    $countryElectionId=$conn->real_escape_string($countryElectionId);
+    $stateElectionId=$conn->real_escape_string($stateElectionId);
+    $phaseElectionId=$conn->real_escape_string($phaseElectionId);
+    $type=$conn->real_escape_string($type);
+    $constituencyName=$conn->real_escape_string($constituencyName);
 
 
     $validParentOp=false;

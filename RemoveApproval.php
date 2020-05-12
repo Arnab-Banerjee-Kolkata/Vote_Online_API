@@ -11,12 +11,12 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$postAuthKey1=$_POST["postAuthKey"];
-$boothId=$_POST["boothId"];
-$electionId=$_POST["electionId"];
+$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$boothId=$conn->real_escape_string($_POST["boothId"]);
+$electionId=$conn->real_escape_string($_POST["electionId"]);
 
 $key_name="post_auth_key";
-checkServerIp();
+checkServerIp($INTERNAL_AUTH_KEY);
 
 $response=array();
 $response['validAuth']=false;
