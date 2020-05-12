@@ -11,13 +11,13 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$postAuthKey1=$_POST["postAuthKey"];
-$name=$_POST["name"];
-$electionId=$_POST["electionId"];
-$constituencyName=$_POST["constituencyName"];
-$partyName=$_POST["partyName"];
-$img=$_POST["img"];
-$boothId=$_POST["boothId"];
+$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$name=$conn->real_escape_string($_POST["name"]);
+$electionId=$conn->real_escape_string($_POST["electionId"]);
+$constituencyName=$conn->real_escape_string($_POST["constituencyName"]);
+$partyName=$conn->real_escape_string($_POST["partyName"]);
+$img=$conn->real_escape_string($_POST["img"]);
+$boothId=$conn->real_escape_string($_POST["boothId"]);
 
 
 $key_name="post_auth_key";
