@@ -16,11 +16,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$postAuthKey1=$_POST["postAuthKey"];
-$electionId=$_POST["electionId"];
-$type=$_POST["type"];
-$constituencyName=$_POST["constituencyName"];
-$adminId=$_POST["adminId"];
+$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$electionId=$conn->real_escape_string($_POST["electionId"]);
+$type=$conn->real_escape_string($_POST["type"]);
+$constituencyName=$conn->real_escape_string($_POST["constituencyName"]);
+$adminId=$conn->real_escape_string($_POST["adminId"]);
 
 
 $key_name="post_auth_key";
