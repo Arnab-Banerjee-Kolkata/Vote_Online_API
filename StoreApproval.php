@@ -1,12 +1,10 @@
 <?php
 
 function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boothId)
-{
+{	
 	include 'Credentials.php';
     include 'Protection.php';
-
     include 'AddGarbageVote.php';
-    include 'Protection.php';
 
 
 
