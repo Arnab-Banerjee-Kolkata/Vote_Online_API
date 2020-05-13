@@ -11,17 +11,13 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-foreach($_POST as $element)
-{
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
-}
-
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $type=$conn->real_escape_string($_POST["type"]);
 $countryElectionId=$conn->real_escape_string($_POST["countryElectionId"]);
 
 
 $key_name="post_auth_key";
+checkServerIp($INTERNAL_AUTH_KEY);
 
 
 $response=array();
@@ -75,9 +71,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     else if($type=="LOK SABHA")
     {
         $response['validType']=true;
+        $count=-1;
         
         $stmt=$conn->prepare("SELECT COUNT(id) FROM Country_Election WHERE id=? AND status=0");
-        $stmt->bind_param("d", $electionId);
+        $stmt->bind_param("d", $countryElectionId);
         $stmt->execute();
         $stmt->bind_result($count);
         $stmt->fetch();
@@ -89,7 +86,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $count=-1;
         
             $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.state_code, State_Election.year, State.name FROM State_Election, State WHERE State_Election.country_election_id=? AND State_Election.status=0 AND State_Election.type=? AND State.code=State_Election.state_code");
-            $stmt->bind_param("s", $type);
+            $stmt->bind_param("ds", $countryElectionId, $type);
             $stmt->execute();
             $stmt->bind_result($id, $name, $stateCode, $year, $stateName);
 
