@@ -3,16 +3,15 @@
 function showPanelOptions($internalAuthKey, $conn, $boothId, $electionId, $type)
 {
     include 'Credentials.php';
-    include 'Protection.php';
 
     $internalAuthKey=$conn->real_escape_string($internalAuthKey);
     $boothId=$conn->real_escape_string($boothId);
     $electionId=$conn->real_escape_string($electionId);
     $type=$conn->real_escape_string($type);
     
-    checkForbiddenPhrases($INTERNAL_AUTH_KEY, $boothId);
-    checkForbiddenPhrases($INTERNAL_AUTH_KEY, $electionId);
-    checkForbiddenPhrases($INTERNAL_AUTH_KEY, $type);
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $boothId);
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $electionId);
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $type);
     
 
     $response=array();
