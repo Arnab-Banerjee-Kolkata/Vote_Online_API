@@ -3,8 +3,7 @@
 function updateParentStatus($internalAuthKey, $conn, $countryElectionId, $stateElectionId, $phaseElectionId, $type, $constituencyName)
 {
     include 'Credentials.php';
-    include 'EncryptionKeys.php';
-    include 'Protection.php';
+    
     
     $internalAuthKey=$conn->real_escape_string($internalAuthKey);
     $countryElectionId=$conn->real_escape_string($countryElectionId);
