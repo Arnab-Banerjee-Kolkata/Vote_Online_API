@@ -4,8 +4,7 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 {	
 	include 'Credentials.php';
     include 'Protection.php';
-    include 'AddGarbageVote.php';
-
+    include 'GarbageAndVoted.php';
 
 
 
@@ -98,7 +97,7 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$constName=$lsConst;
 			
 		}
-		$response['garbageVote']=addGarbageVote($INTERNAL_AUTH_KEY,$constName,$phaseId);
+		$response['garbageVoted']=garbageAndVoted($INTERNAL_AUTH_KEY,$constName,$phaseId,$aadhaarNo,$boothId);
 	}
     return $response;
 }
