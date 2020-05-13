@@ -15,6 +15,11 @@ $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $type=$conn->real_escape_string($_POST["type"]);
 $countryElectionId=$conn->real_escape_string($_POST["countryElectionId"]);
 
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
+}
+
 
 $key_name="post_auth_key";
 checkServerIp($INTERNAL_AUTH_KEY);
