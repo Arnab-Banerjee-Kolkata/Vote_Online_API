@@ -3,6 +3,7 @@
 include 'Credentials.php';
 include 'StoreApproval.php';
 include 'Protection.php';
+include 'EncryptionKeys.php';
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -41,10 +42,10 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 	$stmt->close();
 	$response['validAuth']=true;
 	
-	$stmt2=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=? AND status=1");
+	$stmt2=$conn->prepare("SELECT COUNT(booth_id), otp FROM Booth WHERE booth_id=? AND status=1");
 	$stmt2->bind_param("s",$boothId);
 	$stmt2->execute();
-	$stmt2->bind_result($count1);
+	$stmt2->bind_result($count1, $boothOtp);
 	
 	if($stmt2->fetch() && $count1==1)
 	{
@@ -89,14 +90,20 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 					$stmt6->bind_param("s",$aadhaarNo);
 					$stmt6->execute();
 					$stmt6->bind_result($otp);
+
+                    $voterOtp=encrypt($INTERNAL_AUTH_KEY, $voterOtp, $keySet[8]);
 					
 					if($stmt6->fetch() && $voterOtp==$otp)
 					{
 						$stmt6->close();
 						$response['validOtp']=true;
 
-                       				 //StoreApproval
-                        			$response['returnValue']=storeApproval($conn,$INTERNAL_AUTH_KEY,$aadhaarNo,$electionId,$type,$boothId);
+                        //return booth OTP
+                        $boothOtp=decrypt($INTERNAL_AUTH_KEY, $boothOtp, $keySet[8]);
+                        $response['boothOtp']=$boothOtp;
+
+                        //StoreApproval
+                        $response['returnValue']=storeApproval($conn,$INTERNAL_AUTH_KEY,$aadhaarNo,$electionId,$type,$boothId);
 					}
 					else
 					{
@@ -109,9 +116,11 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 						$newOtp=mt_rand(1000, mt_rand(1001,9999));
 						$times--;
 					}
+
+                    $newOtp=encrypt($INTERNAL_AUTH_KEY, $newOtp, $keySet[8]);
 		
 					$stmt7=$conn->prepare("UPDATE Credentials SET voter_otp=? WHERE aadhaar_no=?");
-					$stmt7->bind_param("ds",$newOtp,$aadhaarNo);
+					$stmt7->bind_param("ss",$newOtp,$aadhaarNo);
 					$stmt7->execute();
 					$stmt7->close();
 				}
