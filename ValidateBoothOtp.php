@@ -3,6 +3,7 @@
 include 'Credentials.php';
 include 'ShowPanelOptions.php';
 include 'Protection.php';
+include 'EncryptionKeys.php';
 
 
 // Create connection
@@ -66,6 +67,9 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $stmt->bind_param("s", $boothId);
         $stmt->execute();
         $stmt->bind_result($otp2);
+
+        $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[8]);
+
         if($stmt->fetch() && $otp1==$otp2)
         {                     
             $stmt->close();
@@ -90,6 +94,9 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $otp=mt_rand(1000, mt_rand(1001,9999));
             $times--;
         }
+
+        $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
+
         $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
         $stmt2->bind_param("ss", $otp, $boothId);
         $stmt2->execute();
