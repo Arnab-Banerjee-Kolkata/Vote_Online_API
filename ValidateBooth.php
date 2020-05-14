@@ -2,6 +2,7 @@
 
 include 'Credentials.php';
 include 'Protection.php';
+include 'EncryptionKeys.php';
 
 $conn=new mysqli($servername,$username,$password,$dbname);
 
@@ -66,6 +67,8 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
             $stmt3->bind_param("s",$booth_id);
             $stmt3->execute();
             $stmt3->bind_result($otpsent);
+
+            $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
             
             if($stmt3->fetch() && $otp==$otpsent)
             {
@@ -82,7 +85,15 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
                 $stmt3->close();
             }
 
-            $otp=rand(1000, 9999);
+            $times=mt_rand(1,12);
+            while($times>0)
+            {
+                $otp=mt_rand(1000, mt_rand(1001,9999));
+                $times--;
+            }
+
+            $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
+
             $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
             $stmt2->bind_param("ss", $otp, $booth_id);
             $stmt2->execute();
