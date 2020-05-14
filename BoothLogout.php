@@ -47,7 +47,7 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 		$stmt2->close();
 		$response['validBooth']=true;
 
-        $stmt=$conn->prepare("UPDATE Booth SET status=0 WHERE booth_id=?");
+        $stmt=$conn->prepare("UPDATE Booth SET status=0 WHERE booth_id=? AND status=1");
         $stmt->bind_param("s", $booth_id);
         $stmt->execute();
         
