@@ -16,6 +16,7 @@
 <b>Booth status::</b><br><br>
     0: Logged out<br>
     1: Logged in<br>
+    2: Suspended<br>
 <br>
 <b>Admin status::</b><br><br>
     0: Logged out<br>
