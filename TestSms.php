@@ -1,21 +1,25 @@
 <?php
 
-	require('textlocal.class.php');
-        require('Credentials.php');
+require('textlocal.class.php');
+require('Credentials.php');
 
-    include 'Credentials.php';
-    include 'Protection.php';
+include 'Credentials.php';
+include 'Protection.php';
 
-function sendOTP($internalAuthKey, $countryCode, $regMobNo, $voterOTP, $API_KEY)
+function sendOTP($conn, $internalAuthKey, $countryCode, $regMobNo, $voterOTP, $API_KEY)
 {
     include 'Credentials.php';
+    include 'EncryptionKeys.php';
  
     if($internalAuthKey==$INTERNAL_AUTH_KEY)
     {
+        $voterOTP=decrypt($internalAuthKey, $voterOTP, $keySet[8]);
         $Textlocal = new Textlocal(false, false, $API_KEY);
 
         $numbers = array($countryCode.$regMobNo);
         $sender = 'RMVOTE';
+        if($voterOTP=="-1")
+            $voterOTP="Corrupt OTP. Contact office";
         $message = 'This is your VOTER OTP: '.$voterOTP;
 
             try{
@@ -23,7 +27,8 @@ function sendOTP($internalAuthKey, $countryCode, $regMobNo, $voterOTP, $API_KEY)
         $result =$Textlocal->sendSms($numbers, $message, $sender);
             }catch(Exception $e)
             {
-                    die('Error: '.$e->getMessage());
+                $conn->close();
+                die('Error: '.$e->getMessage());
             }
 
         if($result->status=="success")
@@ -54,7 +59,7 @@ $aadhaarNo=$conn->real_escape_string($_POST["aadhaarNo"]);
 $smsAuthKey1=$conn->real_escape_string($_POST["smsAuthKey"]);
 $boothId=$conn->real_escape_string($_POST["boothId"]);
 
-checkServerIp($INTERNAL_AUTH_KEY);
+//checkServerIp($INTERNAL_AUTH_KEY);
 
 
 
@@ -65,7 +70,7 @@ $response['validAadhaar']=false;
 $response['validSmsAuth']=false;
 
 
-$stmt=$conn->prepare("SELECT COUNT(id) FROM Booth WHERE id=? AND status=1");
+$stmt=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=? AND status=1");
 $stmt->bind_param("s", $boothId);
 $stmt->execute();
 $stmt->bind_result($count);
@@ -115,7 +120,7 @@ if($count==1)
                         $stmt3->close();
                         $response['validSmsAuth']=true;
                     
-                        if(sendOTP($INTERNAL_AUTH_KEY, $countryCode, $regMobNo, $voterOTP, $API_KEY))
+                        if(sendOTP($conn, $INTERNAL_AUTH_KEY, $countryCode, $regMobNo, $voterOTP, $API_KEY))
                             $response['success']=true;
                     }
                     
