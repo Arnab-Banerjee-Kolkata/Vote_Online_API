@@ -36,19 +36,12 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 	$stmt->close();
 	$response['validAuth']=true;
 	
-	$stmt2=$conn->prepare("SELECT COUNT(booth_id), network_address FROM Booth WHERE booth_id=?");
+	$stmt2=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=?");
 	$stmt2->bind_param("s",$booth_id);
 	$stmt2->execute();
-	$stmt2->bind_result($count, $network);
+	$stmt2->bind_result($count);
     $stmt2->fetch();
     $stmt2->close();
-    
-
-	if($userIp==$network && $userIp!=null)
-    {
-        $response["net"]="WORKING";
-        $response["count"]=$count;
-    }
 	
 	if($count==1 )
 	{
