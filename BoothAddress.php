@@ -3,6 +3,11 @@
 include 'Credentials.php';
 include 'Protection.php';
 
+
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
+}
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -14,8 +19,6 @@ if ($conn->connect_error) {
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $place=$conn->real_escape_string($_POST["place"]);
 
-checkForbiddenPhrase($INTERNAL_AUTH_KEY, $postAuthKey1);
-checkForbiddenPhrase($INTERNAL_AUTH_KEY, $place);
 
 $key_name="post_auth_key";
 
