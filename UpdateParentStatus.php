@@ -11,12 +11,6 @@ function updateParentStatus($internalAuthKey, $conn, $countryElectionId, $stateE
     $phaseElectionId=$conn->real_escape_string($phaseElectionId);
     $type=$conn->real_escape_string($type);
     $constituencyName=$conn->real_escape_string($constituencyName);
-    
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $countryElectionId);
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $stateElectionId);
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $phaseElectionId);
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $type);
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $constituencyName);
 
 
     $validParentOp=false;
