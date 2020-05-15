@@ -61,7 +61,7 @@ $boothId=$conn->real_escape_string($_POST["boothId"]);
 $electionId=$conn->real_escape_string($_POST["electionId"]);
 $type=$conn->real_escape_string($_POST["type"]);
 
-//checkServerIp($INTERNAL_AUTH_KEY);
+checkServerIp($INTERNAL_AUTH_KEY);
 
 
 
