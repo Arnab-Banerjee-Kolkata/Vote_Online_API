@@ -4,6 +4,10 @@
 include 'Credentials.php';
 include 'Protection.php';
 
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
+}
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 $vbConn=new mysqli($vbServerName, $vbUserName, $vbPassword, $vbDbName);
@@ -17,10 +21,6 @@ if($vbConn->connect_error){
     die("Connection failed: " . $vbConn->connect_error);
 }
 
-foreach($_POST as $element)
-{
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
-}
 
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $boothId=$conn->real_escape_string($_POST["boothId"]);
