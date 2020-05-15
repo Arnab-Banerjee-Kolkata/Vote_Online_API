@@ -4,6 +4,10 @@ function garbageAndVoted($internalAuthKey,$constName,$phaseId,$aadhaarNo,$boothI
 {
 	include 'Credentials.php';
 	
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $constName);
+	checkForbiddenPhrase($INTERNAL_AUTH_KEY, $phaseId);
+	checkForbiddenPhrase($INTERNAL_AUTH_KEY, $aadhaarNo);
+	checkForbiddenPhrase($INTERNAL_AUTH_KEY, $boothId);
 	// Create connection
 	$vbConn = new mysqli($vbServerName, $vbUserName, $vbPassword, $vbDbName);
 	
@@ -13,10 +17,6 @@ function garbageAndVoted($internalAuthKey,$constName,$phaseId,$aadhaarNo,$boothI
 	$aadhaarNo=$vbConn->real_escape_string($aadhaarNo);
 	$boothId=$vbConn->real_escape_string($boothId);
 	
-	checkForbiddenPhrase($INTERNAL_AUTH_KEY, $constName);
-	checkForbiddenPhrase($INTERNAL_AUTH_KEY, $phaseId);
-	checkForbiddenPhrase($INTERNAL_AUTH_KEY, $aadhaarNo);
-	checkForbiddenPhrase($INTERNAL_AUTH_KEY, $boothId);
 
 	// Check connection
 	if ($vbConn->connect_error) {
@@ -31,7 +31,7 @@ function garbageAndVoted($internalAuthKey,$constName,$phaseId,$aadhaarNo,$boothI
 	
 	if($internalAuthKey==$INTERNAL_AUTH_KEY)
     	{
-        		$response['validInternalAuth2']=true;
+        	$response['validInternalAuth2']=true;
 			
 			$stmt=$vbConn->prepare("SELECT COUNT(en_vote),count FROM Govt_Vote WHERE phase_election_id=? AND en_vote=? AND constituency_name=?");
 			$stmt->bind_param("dss",$phaseId,$garbage,$constName);
