@@ -99,11 +99,14 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 						$response['validOtp']=true;
 
                         //return booth OTP
-                        $boothOtp=decrypt($INTERNAL_AUTH_KEY, $boothOtp, $keySet[8]);
-                        $response['boothOtp']=$boothOtp;
+                        $boothOtp=decrypt($INTERNAL_AUTH_KEY, $boothOtp, $keySet[8]);                        
 
                         //StoreApproval
                         $response['returnValue']=storeApproval($conn,$INTERNAL_AUTH_KEY,$aadhaarNo,$electionId,$type,$boothId);
+                        if($response['returnValue']['garbageAndVoted']['success'])
+                        {
+                            $response['boothOtp']=$boothOtp;
+                        }
 					}
 					else
 					{
