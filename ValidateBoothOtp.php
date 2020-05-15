@@ -5,7 +5,10 @@ include 'ShowPanelOptions.php';
 include 'Protection.php';
 include 'EncryptionKeys.php';
 
-
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
+}
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -14,10 +17,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-foreach($_POST as $element)
-{
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
-}
 
 $boothId=$conn->real_escape_string($_POST["boothId"]);
 $otp1=$conn->real_escape_string($_POST["otp"]);
