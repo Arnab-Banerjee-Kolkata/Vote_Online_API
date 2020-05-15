@@ -3,8 +3,8 @@
 function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boothId)
 {	
 	include 'Credentials.php';
-    include 'Protection.php';
     include 'GarbageAndVoted.php';
+
 
 
 
@@ -14,15 +14,10 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
     $type=$conn->real_escape_string($type);
     $boothId=$conn->real_escape_string($boothId);
     
-    
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $aadhaarNo);
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $electionId);
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $type);
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $boothId);
-    
 	
 	$response=array();
 	$response['validInternalAuth']=false;
+    $response['validVoterStatus']=false;
 	
 	if($internalAuthKey==$INTERNAL_AUTH_KEY)
     {
@@ -52,14 +47,28 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt3->fetch();
 			$stmt3->close();
 			
-			$stmt4=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name) 
-			VALUES (?,?,?)");
-			$stmt4->bind_param("dss",$phaseId,$boothId,$vsConst);
+            $count=-1;
+            $stmt4=$conn->prepare("SELECT COUNT(aadhaar_no) FROM  Govt_Vote_Status WHERE aadhaar_no=? AND election_id=?");
+			$stmt4->bind_param("sd",$aadhaarNo, $phaseId);
 			$stmt4->execute();
-			$stmt4->close();
-			
-			$response['phaseId']=$phaseId;
-			$constName=$vsConst;
+			$stmt4->bind_result($count);
+            $stmt4->fetch();
+            $stmt4->close();
+
+            if($count==0)
+            {
+                $count=-1;
+                $response['validVoterStatus']=true;
+
+                $stmt4=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name) 
+                VALUES (?,?,?)");
+                $stmt4->bind_param("dss",$phaseId,$boothId,$vsConst);
+                $stmt4->execute();
+                $stmt4->close();
+                
+                
+                $constName=$vsConst;
+            }
 		}
 		elseif($type=="LOK SABHA")
 		{
@@ -85,19 +94,34 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 			$stmt8->bind_result($phaseId);
 			$stmt8->fetch();
 			$stmt8->close();
+
+            $count=-1;
+            $stmt4=$conn->prepare("SELECT COUNT(aadhaar_no) FROM  Govt_Vote_Status WHERE aadhaar_no=? AND election_id=?");
+			$stmt4->bind_param("sd",$aadhaarNo, $phaseId);
+			$stmt4->execute();
+			$stmt4->bind_result($count);
+            $stmt4->fetch();
+            $stmt4->close();
+
+            if($count==0)
+            {
+                $count=-1;
+                $response['validVoterStatus']=true;
 			
-			$stmt9=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name)
-			VALUES (?,?,?)");
-			$stmt9->bind_param("dss",$phaseId,$boothId,$lsConst);
-			$stmt9->execute();
-			$stmt9->fetch();
-			$stmt9->close();
-			
-			$response['phaseId']=$phaseId;
-			$constName=$lsConst;
+                $stmt9=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name)
+                VALUES (?,?,?)");
+                $stmt9->bind_param("dss",$phaseId,$boothId,$lsConst);
+                $stmt9->execute();
+                $stmt9->fetch();
+                $stmt9->close();
+						
+			    $constName=$lsConst;
+            }
 			
 		}
-		$response['garbageVoted']=garbageAndVoted($INTERNAL_AUTH_KEY,$constName,$phaseId,$aadhaarNo,$boothId);
+
+        if($response['validVoterStatus'])
+		    $response['garbageVoted']=garbageAndVoted($INTERNAL_AUTH_KEY,$constName,$phaseId,$aadhaarNo,$boothId);
 	}
     return $response;
 }
