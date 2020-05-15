@@ -2,6 +2,7 @@
 
 include 'Credentials.php';
 include 'Protection.php';
+include 'EncryptionKeys.php';
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -21,7 +22,7 @@ $adminId=$conn->real_escape_string($_POST["adminId"]);
 $adminOtp=$conn->real_escape_string($_POST["adminOtp"]);
 
 $key_name="post_auth_key";
-checkServerIp($INTERNAL_AUTH_KEY);
+//checkServerIp($INTERNAL_AUTH_KEY);
 
 $response=array();
 $response['validAuth']=false;
@@ -54,6 +55,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		$stmt2->bind_param("s",$adminId);
 		$stmt2->execute();
 		$stmt2->bind_result($otp);
+
+        $adminOtp=encrypt($INTERNAL_AUTH_KEY, $adminOtp, $keySet[38]);
 		
 		if($stmt2->fetch() && $otp==$adminOtp)
 		{
@@ -78,9 +81,11 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$otp1=mt_rand(1000, mt_rand(1001,9999));
 			$times--;
 		}
+
+        $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[38]);
 		
 		$stmt3=$conn->prepare("UPDATE Admin_Credentials SET OTP=? WHERE id=?");
-		$stmt3->bind_param("ds",$otp1,$adminId);
+		$stmt3->bind_param("ss",$otp1,$adminId);
 		$stmt3->execute();
 		$stmt3->close();
 	}
