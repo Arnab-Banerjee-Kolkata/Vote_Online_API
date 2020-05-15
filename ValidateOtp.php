@@ -3,7 +3,10 @@
 include 'Credentials.php';
 include 'Protection.php';
 
-
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
+}
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -12,10 +15,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-foreach($_POST as $element)
-{
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
-}
 
 $category=$conn->real_escape_string($_POST["category"]);
 $boothId=$conn->real_escape_string($_POST["boothId"]);
