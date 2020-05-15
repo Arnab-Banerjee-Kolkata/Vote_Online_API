@@ -3,7 +3,11 @@
 include 'Credentials.php';
 include 'Protection.php';
 
-//ini_set('display_errors', 1);
+checkServerIp($INTERNAL_AUTH_KEY);
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
+}
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -13,12 +17,9 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-foreach($_POST as $element)
-{
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
-}
 
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$adminId=$conn->real_escape_string($_POST["adminId"]);  
 
 
 $key_name="post_auth_key";
@@ -27,6 +28,7 @@ $key_name="post_auth_key";
 $response=array();
 $response['success']=false;
 $response['validAuth']=false;
+$response['validAdmin']=false;
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
 $stmt3->bind_param("s", $key_name);
@@ -40,26 +42,39 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt3->close();
     $response['validAuth']=true;
 
-    $partyList=array();
-
-
-    $stmt=$conn->prepare("SELECT name, symbol FROM Party");
+    $stmt=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
+    $stmt->bind_param("s", $adminId);
     $stmt->execute();
-    $stmt->bind_result($name, $symbol);
-
-    while($stmt->fetch())
-    {
-        $party=array();
-        $party['name']=$name;
-        $party['symbol']=$symbol;
-
-        array_push($partyList, $party);
-    }
+    $stmt->bind_result($count);
+    $stmt->fetch();
     $stmt->close();
 
-    $response['partyList']=$partyList;
+    if($count==1)
+    {
+        $response['validAdmin']=true;
+        $count=-1;
 
-    $response['success']=true;
+        $partyList=array();
+
+
+        $stmt=$conn->prepare("SELECT name, symbol FROM Party");
+        $stmt->execute();
+        $stmt->bind_result($name, $symbol);
+
+        while($stmt->fetch())
+        {
+            $party=array();
+            $party['name']=$name;
+            $party['symbol']=$symbol;
+
+            array_push($partyList, $party);
+        }
+        $stmt->close();
+
+        $response['partyList']=$partyList;
+
+        $response['success']=true;
+    }
 }
 $conn->close();
 
