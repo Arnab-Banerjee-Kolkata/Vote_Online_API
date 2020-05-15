@@ -22,7 +22,7 @@ $adminId=$conn->real_escape_string($_POST["adminId"]);
 $adminOtp=$conn->real_escape_string($_POST["adminOtp"]);
 
 $key_name="post_auth_key";
-//checkServerIp($INTERNAL_AUTH_KEY);
+checkServerIp($INTERNAL_AUTH_KEY);
 
 $response=array();
 $response['validAuth']=false;
