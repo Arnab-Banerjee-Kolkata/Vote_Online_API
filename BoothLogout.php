@@ -3,23 +3,24 @@
 include 'Credentials.php';
 include 'Protection.php';
 
+checkServerIp($INTERNAL_AUTH_KEY);
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
+}
+
 $conn=new mysqli($servername,$username,$password,$dbname);
 
 if($conn->connect_error){
 	die("Connection failed ".$conn->connect_error);
 }
 
-foreach($_POST as $element)
-{
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
-}
 
 $postAuthKey=$conn->real_escape_string($_POST["postAuthKey"]);
 $booth_id=$conn->real_escape_string($_POST["booth_id"]);
 
 
 $key_name="post_auth_key";
-checkServerIp($INTERNAL_AUTH_KEY);
 
 $response=array();
 $response['success']=false;
