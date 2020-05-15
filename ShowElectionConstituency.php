@@ -3,6 +3,11 @@
 include 'Credentials.php';
 include 'Protection.php';
 
+checkServerIp($INTERNAL_AUTH_KEY);
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
+}
 //ini_set('display_errors', 1);
 
 // Create connection
@@ -13,13 +18,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-foreach($_POST as $element)
-{
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
-}
 
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $electionId=$conn->real_escape_string($_POST["electionId"]);
+$adminId=$conn->real_escape_string($_POST["adminId"]);
 
 
 $key_name="post_auth_key";
@@ -28,6 +30,7 @@ $key_name="post_auth_key";
 $response=array();
 $response['success']=false;
 $response['validAuth']=false;
+$response['validAdmin']=false;
 $response['validElection']=false;
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
@@ -42,33 +45,45 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt3->close();
     $response['validAuth']=true;
 
-
-    $stmt=$conn->prepare("SELECT state_code, phase_code FROM Pub_Govt_Election WHERE id=?");
-    $stmt->bind_param("d", $electionId);
+    $stmt=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
+    $stmt->bind_param("s", $adminId);
     $stmt->execute();
-    $stmt->bind_result($stateCode, $phaseCode);
+    $stmt->bind_result($count);
+    $stmt->fetch();
+    $stmt->close();
 
-    if($stmt->fetch())
+    if($count==1)
     {
-        $stmt->close();
-        $response['validElection']=true;
+        $response['validAdmin']=true;
+        $count=-1;
 
-        $constituencyList=array();
-
-        $stmt=$conn->prepare("SELECT name FROM Constituency WHERE state_code=? AND phase_code=?");
-        $stmt->bind_param("ss",$stateCode, $phaseCode);
+        $stmt=$conn->prepare("SELECT state_code, phase_code FROM Pub_Govt_Election WHERE id=?");
+        $stmt->bind_param("d", $electionId);
         $stmt->execute();
-        $stmt->bind_result($name);
+        $stmt->bind_result($stateCode, $phaseCode);
 
-        while($stmt->fetch())
+        if($stmt->fetch())
         {
-            array_push($constituencyList, $name);
+            $stmt->close();
+            $response['validElection']=true;
+
+            $constituencyList=array();
+
+            $stmt=$conn->prepare("SELECT name FROM Constituency WHERE state_code=? AND phase_code=?");
+            $stmt->bind_param("ss",$stateCode, $phaseCode);
+            $stmt->execute();
+            $stmt->bind_result($name);
+
+            while($stmt->fetch())
+            {
+                array_push($constituencyList, $name);
+            }
+            $stmt->close();
+
+            $response['constituencyList']=$constituencyList;
+
+            $response['success']=true;
         }
-        $stmt->close();
-
-        $response['constituencyList']=$constituencyList;
-
-        $response['success']=true;
     }
 }
 $conn->close();
