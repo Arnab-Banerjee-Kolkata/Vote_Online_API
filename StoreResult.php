@@ -7,11 +7,6 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
     include 'UpdateParentStatus.php';
     include 'Protection.php';
     
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $countryElectionId);
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $stateElectionId);
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $phaseElectionId);
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $type);
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $constituencyName);
     
     $vbConn=new mysqli($vbServerName, $vbUserName, $vbPassword, $vbDbName);
 
