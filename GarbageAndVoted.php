@@ -4,10 +4,7 @@ function garbageAndVoted($internalAuthKey,$constName,$phaseId,$aadhaarNo,$boothI
 {
 	include 'Credentials.php';
 	
-    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $constName);
-	checkForbiddenPhrase($INTERNAL_AUTH_KEY, $phaseId);
-	checkForbiddenPhrase($INTERNAL_AUTH_KEY, $aadhaarNo);
-	checkForbiddenPhrase($INTERNAL_AUTH_KEY, $boothId);
+    
 	// Create connection
 	$vbConn = new mysqli($vbServerName, $vbUserName, $vbPassword, $vbDbName);
 	
