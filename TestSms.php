@@ -72,6 +72,7 @@ $response['validAadhaar']=false;
 $response['validSmsAuth']=false;
 $response['validType']=false;
 $response['validVoter']=false;
+$response['validLimit']=false;
 
 
 $stmt=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=? AND status=1");
@@ -179,9 +180,41 @@ if($count==1)
                             {
                                 $response['validVoter']=true;
                                 $count=-1;
-                                
-                                if(sendOTP($conn, $INTERNAL_AUTH_KEY, $countryCode, $regMobNo, $voterOTP, $API_KEY))
-                                    $response['success']=true;
+
+                                $stmt=$conn->prepare("SELECT COUNT(sms_count), sms_count FROM otp_count WHERE booth_id=? AND aadhaar_no=? AND election_id=? AND type=?");
+                                $stmt->bind_param("ssds", $boothId, $aadhaarNo, $electionId, $type);
+                                $stmt->execute();
+                                $stmt->bind_result($count, $smsCount);
+                                $stmt->fetch();
+                                $stmt->close();
+                        
+                                if($smsCount<4 || $count==0)
+                                {
+                                    $response['validLimit']=true;                                    
+                                    $smsCount++;
+
+                                    if(sendOTP($conn, $INTERNAL_AUTH_KEY, $countryCode, $regMobNo, $voterOTP, $API_KEY))
+                                    {
+                                        if($count==0)
+                                        {
+                                            $stmt=$conn->prepare("INSERT INTO otp_count (booth_id, aadhaar_no, election_id, type, sms_count) VALUES (?,?,?,?,1)");
+                                            $stmt->bind_param("ssds", $boothId, $aadhaarNo, $electionId, $type);
+                                            $stmt->execute();
+                                            $stmt->fetch();
+                                            $stmt->close();
+                                        }
+                                        else
+                                        {
+                                            $stmt=$conn->prepare("UPDATE otp_count SET sms_count=? WHERE booth_id=? AND aadhaar_no=? AND election_id=? AND type=?");
+                                            $stmt->bind_param("dssds", $smsCount, $boothId, $aadhaarNo, $electionId, $type);
+                                            $stmt->execute();
+                                            $stmt->fetch();
+                                            $stmt->close();
+                                        }
+
+                                        $response['success']=true;
+                                    }
+                                }
                             }
                         }
                     }
