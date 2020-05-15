@@ -20,7 +20,7 @@ if ($conn->connect_error) {
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $electionName=$conn->real_escape_string($_POST["electionName"]);
 $electionYear=$conn->real_escape_string($_POST["electionYear"]);
-$boothId=$conn->real_escape_string($_POST["boothId"]);
+$adminId=$conn->real_escape_string($_POST["adminId"]);
 
 
 $key_name="post_auth_key";
@@ -29,7 +29,7 @@ $key_name="post_auth_key";
 $response=array();
 $response['success']=false;
 $response['validAuth']=false;
-$response['validBooth']=false;
+$response['validAdmin']=false;
 $response['validName']=false;
 $response['validYear']=false;
 $response['validElection']=false;
@@ -47,8 +47,8 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $response['validAuth']=true;
 
     
-    $stmt=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=? AND status=1");
-    $stmt->bind_param("s", $boothId);
+        $stmt=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
+    $stmt->bind_param("s", $adminId);
     $stmt->execute();
     $stmt->bind_result($count);
 
@@ -56,7 +56,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     {
         $count=-1;
         $stmt->close();
-        $response['validBooth']=true;
+        $response['validAdmin']=true;
 
         $electionName=trim($electionName);
         $electionName=strtoupper($electionName);
