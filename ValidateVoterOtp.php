@@ -5,6 +5,11 @@ include 'StoreApproval.php';
 include 'Protection.php';
 include 'EncryptionKeys.php';
 
+checkServerIp($INTERNAL_AUTH_KEY);
+foreach($_POST as $element)
+{
+    checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
+}
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -21,7 +26,6 @@ $electionId=$conn->real_escape_string($_POST["electionId"]);
 $type=$conn->real_escape_string($_POST["type"]);
 
 $key_name="post_auth_key";
-checkServerIp($INTERNAL_AUTH_KEY);
 
 
 $response=array();
