@@ -1,44 +1,14 @@
 <?php
 
-require('textlocal.class.php');
-require('Credentials.php');
 include 'Credentials.php';
 include 'Protection.php';
+include 'EncryptionKeys.php';
 
-function sendOTP($conn, $internalAuthKey, $countryCode, $regMobNo, $adminOTP, $API_KEY)
-{
-    include 'Credentials.php';    
-    include 'EncryptionKeys.php';     
-    if($internalAuthKey==$INTERNAL_AUTH_KEY)    
-    {
-        $adminOTP=decrypt($internalAuthKey, $adminOTP, $keySet[38]);        
-        $Textlocal = new Textlocal(false, false, $API_KEY);
-        $numbers = array($countryCode.$regMobNo);        
-        $sender = 'RMVOTE';        
-        if($adminOTP=="-1")            
-        $adminOTP="Corrupt OTP. Contact office";        
-        $message = 'This is your ADMIN OTP: '.$adminOTP;
-        try{
-        $result =$Textlocal->sendSms($numbers, $message, $sender);            
-        }catch(Exception $e)            
-        {                
-            $conn->close();                
-            die('Error: '.$e->getMessage());            
-        }
-        if($result->status=="success")            
-            return true;        
-        else            
-            return false;    
-    }    
-    return false;
-}
-
+//checkServerIp($INTERNAL_AUTH_KEY);
 foreach($_POST as $element)
 {
     checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
 }
-
-//checkServerIp($INTERNAL_AUTH_KEY);
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -48,17 +18,18 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $adminId=$conn->real_escape_string($_POST["adminId"]);
+$adminOtp=$conn->real_escape_string($_POST["adminOtp"]);
 
 $key_name="post_auth_key";
 
-
 $response=array();
-
-$response['success']=false;
 $response['validAuth']=false;
 $response['validAdmin']=false;
+$response['validOtp']=false;
+$response['success']=false;
 
 $stmt=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name=?");
 $stmt->bind_param("s",$key_name);
@@ -70,39 +41,87 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 	$stmt->close();
 	$response['validAuth']=true;
 	
-	$stmt2=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=0");
-	$stmt2->bind_param("s",$adminId);
-	$stmt2->execute();
-	$stmt2->bind_result($count);
+	$stmt1=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=0");
+	$stmt1->bind_param("s",$adminId);
+	$stmt1->execute();
+	$stmt1->bind_result($count1);
 	
-	if($stmt2->fetch() && $count==1)
+	if($stmt1->fetch() && $count1==1)
 	{
-		$stmt2->close();
-		$count=-1;
-		
+		$stmt1->close();
+		$count1=-1;
 		$response['validAdmin']=true;
 		
-		$stmt3=$conn->prepare("SELECT phone_number,OTP,sms_count FROM Admin_Credentials WHERE id=?");
-		$stmt3->bind_param("s",$adminId);
+		$stmt2=$conn->prepare("SELECT OTP,sms_count FROM Admin_Credentials WHERE id=? AND status=0");
+		$stmt2->bind_param("s",$adminId);
+		$stmt2->execute();
+		$stmt2->bind_result($otp,$smsCount);
+		$stmt2->fetch();
+
+        $adminOtp=encrypt($INTERNAL_AUTH_KEY, $adminOtp, $keySet[38]);
+		
+		if($otp==$adminOtp && $smsCount<4)
+		{
+			$stmt2->close();
+			
+			$response['validOtp']=true;
+			$smsCount=0;
+			
+			$stmt4=$conn->prepare("UPDATE Admin_Credentials SET status=1,sms_count=? WHERE id=?");
+			$stmt4->bind_param("ds",$smsCount,$adminId);
+			$stmt4->execute();
+			$stmt4->close();
+			
+            $response['success']=true;
+		}
+		
+		elseif($otp!=$adminOtp)
+		{
+			$stmt2->close();
+			
+			++$smsCount;
+			
+			if($smsCount>=4)	//Suspend admin
+			{
+				$stmt5=$conn->prepare("UPDATE Admin_Credentials SET status=2 WHERE id=?");
+				$stmt5->bind_param("s",$adminId);
+				$stmt5->execute();
+				$stmt5->close();
+				
+				$response['adminSuspended']=true;
+				
+			}
+			
+			$stmt6=$conn->prepare("UPDATE Admin_Credentials SET sms_count=? WHERE id=?");
+			$stmt6->bind_param("ds",$smsCount,$adminId);
+			$stmt6->execute();
+			$stmt6->close();		
+		}
+
+		$times=mt_rand(1,12);
+		while($times>0)
+		{
+			$otp1=mt_rand(1000, mt_rand(1001,9999));
+			$times--;
+		}
+
+        $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[38]);
+		
+		$stmt3=$conn->prepare("UPDATE Admin_Credentials SET OTP=? WHERE id=?");
+		$stmt3->bind_param("ss",$otp1,$adminId);
 		$stmt3->execute();
-		$stmt3->bind_result($regMobNo,$adminOTP,$smsCount);
-		$stmt3->fetch();
 		$stmt3->close();
-		
-		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$adminOTP,$API_KEY);
-		
-		$stmt4=$conn->prepare("UPDATE Admin_Credentials SET sms_count=? WHERE id=?");
-		$stmt4->bind_param("ds",++$smsCount,$adminId);
-		$stmt4->execute();
-		$stmt4->fetch();
-		$stmt4->close();
 	}
+	
 	else
-		$stmt2->close();
+	{
+		$stmt1->close();
+	}
 }
 else
+{
 	$stmt->close();
-
+}
 $conn->close();
 echo json_encode($response);
 
