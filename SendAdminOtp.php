@@ -38,7 +38,7 @@ foreach($_POST as $element)
     checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
 }
 
-//checkServerIp($INTERNAL_AUTH_KEY);
+checkServerIp($INTERNAL_AUTH_KEY);
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
