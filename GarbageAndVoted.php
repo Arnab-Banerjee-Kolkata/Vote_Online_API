@@ -40,9 +40,10 @@ function garbageAndVoted($internalAuthKey,$constName,$phaseId,$aadhaarNo,$boothI
 			if($count1==1)
 			{
 				$count1=-1;
+                $countInTable++;
 				
 				$stmt2=$vbConn->prepare("UPDATE Govt_Vote SET count=? WHERE phase_election_id=? AND en_vote=? AND constituency_name=?");
-				$stmt2->bind_param("ddss",++$countInTable,$phaseId,$garbage,$constName);
+				$stmt2->bind_param("ddss",$countInTable,$phaseId,$garbage,$constName);
 				$stmt2->execute();
 				$stmt2->fetch();
 				$stmt2->close();
