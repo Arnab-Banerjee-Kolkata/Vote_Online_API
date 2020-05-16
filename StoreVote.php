@@ -124,8 +124,8 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $deletedRows=-1;
 
                     
-                    $stmt=$vbConn->prepare("SELECT count FROM Govt_Vote WHERE phase_election_id=? AND en_vote=?");
-                    $stmt->bind_param("ds", $phaseElectionId, $garbage);
+                    $stmt=$vbConn->prepare("SELECT count FROM Govt_Vote WHERE phase_election_id=? AND en_vote=? AND constituency_name=?");
+                    $stmt->bind_param("dss", $phaseElectionId, $garbage, $constituencyName);
                     $stmt->execute();   
                     $stmt->bind_result($count);
                     $stmt->fetch();
@@ -137,17 +137,19 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     
                     
                         $count--;
+                    
                         $stmt=$vbConn->prepare("UPDATE Govt_Vote SET count=? WHERE en_vote=? AND phase_election_id=?");
                         $stmt->bind_param("dsd", $count, $garbage, $phaseElectionId);
                         $stmt->execute();                        
                         $stmt->fetch();
                         $stmt->close();
                         
+                        
                         $count=-1;
                         
                         
-                        $stmt=$vbConn->prepare("SELECT count FROM Govt_Vote WHERE phase_election_id=? AND en_vote=?");
-                        $stmt->bind_param("ds", $phaseElectionId, $enVote);
+                        $stmt=$vbConn->prepare("SELECT count FROM Govt_Vote WHERE phase_election_id=? AND en_vote=? AND constituency_name=?");
+                        $stmt->bind_param("dss", $phaseElectionId, $enVote, $constituencyName);
                         $stmt->execute();   
                         $stmt->bind_result($count);
                         $stmt->fetch();
