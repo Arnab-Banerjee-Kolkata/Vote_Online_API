@@ -38,7 +38,7 @@ foreach($_POST as $element)
     checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
 }
 
-checkServerIp($INTERNAL_AUTH_KEY);
+//checkServerIp($INTERNAL_AUTH_KEY);
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -82,14 +82,20 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		
 		$response['validAdmin']=true;
 		
-		$stmt3=$conn->prepare("SELECT phone_number,OTP FROM Admin_Credentials WHERE id=?");
+		$stmt3=$conn->prepare("SELECT phone_number,OTP,sms_count FROM Admin_Credentials WHERE id=?");
 		$stmt3->bind_param("s",$adminId);
 		$stmt3->execute();
-		$stmt3->bind_result($regMobNo,$adminOTP);
+		$stmt3->bind_result($regMobNo,$adminOTP,$smsCount);
 		$stmt3->fetch();
 		$stmt3->close();
 		
 		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$adminOTP,$API_KEY);
+		
+		$stmt4=$conn->prepare("UPDATE Admin_Credentials SET sms_count=? WHERE id=?");
+		$stmt4->bind_param("ds",++$smsCount,$adminId);
+		$stmt4->execute();
+		$stmt4->fetch();
+		$stmt4->close();
 	}
 	else
 		$stmt2->close();
