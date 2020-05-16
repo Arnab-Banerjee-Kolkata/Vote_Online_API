@@ -21,6 +21,7 @@ if ($conn->connect_error) {
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $stateCode=$conn->real_escape_string($_POST["stateCode"]);
 $type=$conn->real_escape_string($_POST["type"]);
+$adminId=$conn->real_escape_string($_POST["adminId"]);
 
 
 $key_name="post_auth_key";
@@ -29,6 +30,7 @@ $key_name="post_auth_key";
 $response=array();
 $response['success']=false;
 $response['validAuth']=false;
+$response['validAdmin']=true;
 $response['validCombination']=false;
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
@@ -43,38 +45,51 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt3->close();
     $response['validAuth']=true;
 
-    $phase=array();
-
-
-    $stmt=$conn->prepare("SELECT COUNT(code) FROM Phase WHERE state_code=? AND type=?");
-    $stmt->bind_param("ss", $stateCode, $type);
+    $stmt=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
+    $stmt->bind_param("s", $adminId);
     $stmt->execute();
     $stmt->bind_result($count);
+    $stmt->fetch();
+    $stmt->close();
 
-    if($stmt->fetch() && $count>=1)
+    if($count==1)
     {
-        $response['validCombination']=true;
-        $stmt->close();
+        $response['validAdmin']=true;
+        $count=-1;
 
-        $stmt=$conn->prepare("SELECT type, code FROM Phase WHERE state_code=? AND type=?");
+        $phase=array();
+
+
+        $stmt=$conn->prepare("SELECT COUNT(code) FROM Phase WHERE state_code=? AND type=?");
         $stmt->bind_param("ss", $stateCode, $type);
         $stmt->execute();
-        $stmt->bind_result($type, $code);
+        $stmt->bind_result($count);
 
-        while($stmt->fetch())
+        if($stmt->fetch() && $count>=1)
         {
-            $temp=array();
-            $temp['type']=$type;
-            $temp['code']=$code;
+            $response['validCombination']=true;
+            $stmt->close();
 
-            array_push($phase, $temp);
+            $stmt=$conn->prepare("SELECT type, code FROM Phase WHERE state_code=? AND type=?");
+            $stmt->bind_param("ss", $stateCode, $type);
+            $stmt->execute();
+            $stmt->bind_result($type, $code);
+
+            while($stmt->fetch())
+            {
+                $temp=array();
+                $temp['type']=$type;
+                $temp['code']=$code;
+
+                array_push($phase, $temp);
+            }
+            $stmt->close();
+
+            $response['phases']=$phase;
+
+            $response['success']=true;
+
         }
-        $stmt->close();
-
-        $response['phases']=$phase;
-
-        $response['success']=true;
-
     }
     
 
