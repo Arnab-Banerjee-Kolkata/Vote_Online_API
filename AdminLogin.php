@@ -4,7 +4,7 @@ include 'Credentials.php';
 include 'Protection.php';
 include 'EncryptionKeys.php';
 
-//checkServerIp($INTERNAL_AUTH_KEY);
+checkServerIp($INTERNAL_AUTH_KEY);
 foreach($_POST as $element)
 {
     checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
