@@ -41,10 +41,10 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 	$stmt->close();
 	$response['validAuth']=true;
 	
-	$stmt1=$conn->prepare("SELECT COUNT(id),OTP,sms_count FROM Admin_Credentials WHERE id=? AND status=0");
+	$stmt1=$conn->prepare("SELECT COUNT(id),OTP,sms_count,otpCount FROM Admin_Credentials WHERE id=? AND status=0");
 	$stmt1->bind_param("s",$adminId);
 	$stmt1->execute();
-	$stmt1->bind_result($count1,$otp,$smsCount);
+	$stmt1->bind_result($count1,$otp,$smsCount,$otpCount);
 	
 	if($stmt1->fetch() && $count1==1)
 	{
@@ -53,21 +53,23 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		$response['validAdmin']=true;
 
         	$adminOtp=encrypt($INTERNAL_AUTH_KEY, $adminOtp, $keySet[38]);
-		
-		if($otp==$adminOtp && $smsCount<=4)
+		$otpCount++;
+
+		if($otp==$adminOtp && $smsCount<=4 && $otpCount<=4)
 		{
 			$response['validOtp']=true;
 			$smsCount=0;
+			$otpCount=0;
 			
 			$stmt4=$conn->prepare("UPDATE Admin_Credentials SET status=1,sms_count=? WHERE id=?");
 			$stmt4->bind_param("ds",$smsCount,$adminId);
 			$stmt4->execute();
 			$stmt4->close();
 			
-            		$response['success']=true;
+			$response['success']=true;
 		}
 		
-		elseif($otp!=$adminOtp && $smsCount>4)
+		elseif($otp!=$adminOtp && ($smsCount>=4 || $otpCount>=4)) //Suspend
 		{
 			$stmt5=$conn->prepare("UPDATE Admin_Credentials SET status=2 WHERE id=?");
 			$stmt5->bind_param("s",$adminId);
@@ -76,7 +78,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			
 			$response['adminSuspended']=true;
 		}
-
+		
 		$times=mt_rand(1,12);
 		while($times>0)
 		{
@@ -85,8 +87,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		}
         	$otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[38]);
 		
-		$stmt3=$conn->prepare("UPDATE Admin_Credentials SET OTP=? WHERE id=?");
-		$stmt3->bind_param("ss",$otp1,$adminId);
+		$stmt3=$conn->prepare("UPDATE Admin_Credentials SET OTP=?,otpCount=? WHERE id=?");
+		$stmt3->bind_param("sds",$otp1,$otpCount,$adminId);
 		$stmt3->execute();
 		$stmt3->close();
 	}
