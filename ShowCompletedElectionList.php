@@ -54,6 +54,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $temp['status']=$status;
         $temp['type']="LOK SABHA";
         $temp['year']=$year;
+        $temp['stateName']="";
         array_push($election, $temp);
 
         $response['success']=true;
