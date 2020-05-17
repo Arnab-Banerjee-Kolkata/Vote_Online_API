@@ -77,7 +77,7 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 		$stmt4->execute();
 		$stmt4->close();
 				
-		$response['adminSuspended']=true;
+		$response['boothSuspended']=true;
             }
 
             $times=mt_rand(1,12);
@@ -98,7 +98,7 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 	}
 }
 else
-    $stmt->close();
+$stmt->close();
 $conn->close();
 
 echo json_encode($response);
