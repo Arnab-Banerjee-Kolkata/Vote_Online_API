@@ -42,48 +42,42 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 	$stmt->close();
 	$response['validAuth']=true;
 	
-	$stmt2=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=?");
+	$stmt2=$conn->prepare("SELECT COUNT(booth_id),status,otp,sms_count FROM Booth WHERE booth_id=?");
 	$stmt2->bind_param("s",$booth_id);
 	$stmt2->execute();
-	$stmt2->bind_result($count);
-    $stmt2->fetch();
-    $stmt2->close();
+	$stmt2->bind_result($count,$loginState,$otpsent,$smsCount);
+	$stmt2->fetch();
+	$stmt2->close();
 	
-	if($count==1 )
+	if($count==1)
 	{
 		$response['validBooth']=true;
-        $count=-1;
+		$count=-1;
 
-        $stmt=$conn->prepare("SELECT status FROM Booth WHERE booth_id=?");
-        $stmt->bind_param("s", $booth_id);
-        $stmt->execute();
-        $stmt->bind_result($loginState);
-
-        if($stmt->fetch() && $loginState==0)
+        if($loginState==0)
         {
-            $stmt->close();
             $response['validLogin']=true;
-
-            $stmt3=$conn->prepare("SELECT otp FROM Booth WHERE booth_id=?");
-            $stmt3->bind_param("s",$booth_id);
-            $stmt3->execute();
-            $stmt3->bind_result($otpsent);
 
             $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
             
-            if($stmt3->fetch() && $otp==$otpsent)
+            if($otp==$otpsent && $smsCount<=4)
             {
                 $response['success']=true;
-                $stmt3->close();
+		$smsCount=0;
 
-                $stmt3=$conn->prepare("UPDATE Booth SET status=1 WHERE booth_id=?");
-                $stmt3->bind_param("s", $booth_id);
+                $stmt3=$conn->prepare("UPDATE Booth SET status=1,sms_count=? WHERE booth_id=?");
+                $stmt3->bind_param("ds",$smsCount,$booth_id);
                 $stmt3->execute();
                 $stmt3->close();
             }
-            else
+            elseif($otp!=$otpsent && $smsCount>=4)
             {
-                $stmt3->close();
+                $stmt4=$conn->prepare("UPDATE Booth SET status=2 WHERE booth_id=?");
+		$stmt4->bind_param("s",$booth_id);
+		$stmt4->execute();
+		$stmt4->close();
+				
+		$response['adminSuspended']=true;
             }
 
             $times=mt_rand(1,12);
@@ -103,11 +97,10 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 		
 	}
 }
+else
+    $stmt->close();
 $conn->close();
 
 echo json_encode($response);
 
 ?>
-			
-	
-	
