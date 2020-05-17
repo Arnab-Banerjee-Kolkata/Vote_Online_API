@@ -70,10 +70,10 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 	$stmt->close();
 	$response['validAuth']=true;
 	
-	$stmt2=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=0");
+	$stmt2=$conn->prepare("SELECT COUNT(id),phone_number,OTP,sms_count FROM Admin_Credentials WHERE id=? AND status=0 AND sms_count<4");
 	$stmt2->bind_param("s",$adminId);
 	$stmt2->execute();
-	$stmt2->bind_result($count);
+	$stmt2->bind_result($count,$regMobNo,$adminOTP,$smsCount);
 	
 	if($stmt2->fetch() && $count==1)
 	{
@@ -81,13 +81,6 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		$count=-1;
 		
 		$response['validAdmin']=true;
-		
-		$stmt3=$conn->prepare("SELECT phone_number,OTP,sms_count FROM Admin_Credentials WHERE id=?");
-		$stmt3->bind_param("s",$adminId);
-		$stmt3->execute();
-		$stmt3->bind_result($regMobNo,$adminOTP,$smsCount);
-		$stmt3->fetch();
-		$stmt3->close();
 		
 		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$adminOTP,$API_KEY);
 		
