@@ -82,14 +82,20 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		
 		$response['validBooth']=true;
 		
-		$stmt3=$conn->prepare("SELECT phone_number,otp FROM Booth WHERE booth_id=?");
+		$stmt3=$conn->prepare("SELECT phone_number,otp,sms_count FROM Booth WHERE booth_id=?");
 		$stmt3->bind_param("s",$boothId);
 		$stmt3->execute();
-		$stmt3->bind_result($regMobNo,$boothOTP);
+		$stmt3->bind_result($regMobNo,$boothOTP,$smsCount);
 		$stmt3->fetch();
 		$stmt3->close();
 		
 		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$boothOTP,$API_KEY);
+		
+		$stmt4=$conn->prepare("UPDATE Booth SET sms_count=? WHERE booth_id=?");
+		$stmt4->bind_param("ds",++$smsCount,$boothId);
+		$stmt4->execute();
+		$stmt4->fetch();
+		$stmt4->close();
 	}
 	else
 		$stmt2->close();
