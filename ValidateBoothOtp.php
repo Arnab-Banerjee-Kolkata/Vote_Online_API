@@ -21,8 +21,6 @@ if ($conn->connect_error) {
 $boothId=$conn->real_escape_string($_POST["boothId"]);
 $otp1=$conn->real_escape_string($_POST["otp"]);
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
-$electionId=$conn->real_escape_string($_POST["electionId"]);
-$type=$conn->real_escape_string($_POST["type"]);
 
 
 $key_name="post_auth_key";
@@ -58,10 +56,9 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     {
         $count=-1;
         $stmt->close();
-        $response['validBooth']=true;
-
-
-
+        $response['validBooth']=true; 
+                   
+        
         $stmt = $conn->prepare("SELECT otp FROM Booth WHERE booth_id=? AND status=1");
         $stmt->bind_param("s", $boothId);
         $stmt->execute();
@@ -73,20 +70,20 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         {                     
             $stmt->close();
             $response['validOtp']=true; 
-            
-            
-            
-            //SHOW APPROPRIATE VOTING PANEL
-            $response['sub']=showPanelOptions($INTERNAL_AUTH_KEY, $conn, $boothId, $electionId, $type);
 
-             
+
+
+            //SHOW APPROPRIATE VOTING PANEL
+            $response['sub']=showPanelOptions($INTERNAL_AUTH_KEY, $conn, $boothId);
+
+
         }    
         else
         {
             $stmt->close();
         }                
-        
-        
+
+
         $times=mt_rand(1,12);
         while($times>0)
         {
@@ -101,6 +98,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $stmt2->execute();
 
         $stmt2->close();
+        
     }
         
     
