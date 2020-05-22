@@ -64,7 +64,7 @@ if($postAuthKey1==$postAuthKey2)
             $response['validType']=true;
             
             $stmt=$conn->prepare("SELECT COUNT(id), status FROM Pub_Govt_Election WHERE id=? AND (status<>4 OR status<>3)");
-            $stmt->bind_param($electionId);
+            $stmt->bind_param("d",$electionId);
             $stmt->execute();
             $stmt->bind_result($count, $oldStatus);
             $stmt->fetch();
@@ -80,7 +80,7 @@ if($postAuthKey1==$postAuthKey2)
                     $response['validStatus']=true;
                     
                     $stmt=$conn->prepare("UPDATE Pub_Govt_Election SET status=? WHERE id=?");
-                    $stmt->bind_param($newStatus, $electionId);
+                    $stmt->bind_param("dd",$newStatus, $electionId);
                     $stmt->execute();
                     $stmt->fetch();
                     $stmt->close();
@@ -94,7 +94,7 @@ if($postAuthKey1==$postAuthKey2)
             $response['validType']=true;
             
             $stmt=$conn->prepare("SELECT COUNT(id), status FROM State_Election WHERE id=? AND (status<>4 OR status<>3)");
-            $stmt->bind_param($electionId);
+            $stmt->bind_param("d",$electionId);
             $stmt->execute();
             $stmt->bind_result($count, $oldStatus);
             $stmt->fetch();
@@ -110,13 +110,13 @@ if($postAuthKey1==$postAuthKey2)
                     $response['validStatus']=true;
                     
                     $stmt=$conn->prepare("UPDATE Pub_Govt_Election SET status=? WHERE state_election_id=?");
-                    $stmt->bind_param($newStatus, $electionId);
+                    $stmt->bind_param("dd",$newStatus, $electionId);
                     $stmt->execute();
                     $stmt->fetch();
                     $stmt->close();
                     
                     $stmt=$conn->prepare("UPDATE State_Election SET status=? WHERE id=?");
-                    $stmt->bind_param($newStatus, $electionId);
+                    $stmt->bind_param("dd",$newStatus, $electionId);
                     $stmt->execute();
                     $stmt->fetch();
                     $stmt->close();
@@ -130,7 +130,7 @@ if($postAuthKey1==$postAuthKey2)
             $response['validType']=true;
             
             $stmt=$conn->prepare("SELECT COUNT(id), status FROM Country_Election WHERE id=? AND (status<>4 OR status<>3)");
-            $stmt->bind_param($electionId);
+            $stmt->bind_param("d",$electionId);
             $stmt->execute();
             $stmt->bind_result($count, $oldStatus);
             $stmt->fetch();
@@ -148,19 +148,19 @@ if($postAuthKey1==$postAuthKey2)
                     $stmt=$conn->prepare("UPDATE Pub_Govt_Election SET status=? WHERE state_election_id IN (
 	SELECT id FROM State_Election WHERE country_election_id=?
 )");
-                    $stmt->bind_param($newStatus, $electionId);
+                    $stmt->bind_param("dd",$newStatus, $electionId);
                     $stmt->execute();
                     $stmt->fetch();
                     $stmt->close();
                     
                     $stmt=$conn->prepare("UPDATE State_Election SET status=? WHERE country_election_id=?");
-                    $stmt->bind_param($newStatus, $electionId);
+                    $stmt->bind_param("dd",$newStatus, $electionId);
                     $stmt->execute();
                     $stmt->fetch();
                     $stmt->close();
                     
                     $stmt=$conn->prepare("UPDATE Country_Election SET status=? WHERE id=?");
-                    $stmt->bind_param($newStatus, $electionId);
+                    $stmt->bind_param("dd",$newStatus, $electionId);
                     $stmt->execute();
                     $stmt->fetch();
                     $stmt->close();
