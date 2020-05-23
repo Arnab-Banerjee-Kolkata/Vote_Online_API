@@ -22,7 +22,7 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
     
     if($vbConn->connect_error)
     {
-        die("Connection failed: " . $vbConn->connect_error);
+        die("Connection failed: ");
     }
 
     $response=array();
