@@ -17,7 +17,7 @@ function garbageAndVoted($internalAuthKey,$constName,$phaseId,$aadhaarNo,$boothI
 
 	// Check connection
 	if ($vbConn->connect_error) {
-    die("Connection failed: " . $vbConn->connect_error);
+    die("Connection failed: ");
     }
 
 
@@ -64,7 +64,7 @@ function garbageAndVoted($internalAuthKey,$constName,$phaseId,$aadhaarNo,$boothI
 			$conn = new mysqli($servername, $username, $password, $dbname);
 
 			if ($conn->connect_error) {
-				die("Connection failed: " . $conn->connect_error);
+				die("Connection failed: ");
 			}
 			
 			$stmt4=$conn->prepare("INSERT INTO Govt_Vote_Status (election_id,aadhaar_no,booth_id) VALUES (?,?,?)");
