@@ -14,11 +14,11 @@ $vbConn=new mysqli($vbServerName, $vbUserName, $vbPassword, $vbDbName);
 
 // Check connection
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: ");
 }
 
 if($vbConn->connect_error){
-    die("Connection failed: " . $vbConn->connect_error);
+    die("Connection failed: ");
 }
 
 
