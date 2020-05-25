@@ -52,7 +52,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		$count1=-1;
 		$response['validAdmin']=true;
 
-        	$adminOtp=encrypt($INTERNAL_AUTH_KEY, $adminOtp, $keySet[38]);
+        $adminOtp=encrypt($INTERNAL_AUTH_KEY, $adminOtp, $keySet[38]);
 		$otpCount++;
 
 		if($otp==$adminOtp && $smsCount<=4 && $otpCount<=4)
@@ -66,7 +66,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$stmt4->execute();
 			$stmt4->close();
 			
-			$response['success']=true;
+            $response['success']=true;
 		}
 		
 		elseif($otp!=$adminOtp && ($smsCount>=4 || $otpCount>=4)) //Suspend
@@ -79,13 +79,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$response['adminSuspended']=true;
 		}
 		
-		$times=mt_rand(1,12);
-		while($times>0)
-		{
-			$otp1=mt_rand(1000, mt_rand(1001,9999));
-			$times--;
-		}
-        	$otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[38]);
+		$otp1=generateOtp($INTERNAL_AUTH_KEY);
+        $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[38]);
 		
 		$stmt3=$conn->prepare("UPDATE Admin_Credentials SET OTP=?,otpCount=? WHERE id=?");
 		$stmt3->bind_param("sds",$otp1,$otpCount,$adminId);
