@@ -72,6 +72,14 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $response['validOtp']=true; 
 
 
+            $otp=generateOtp($INTERNAL_AUTH_KEY);
+            $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
+
+            $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
+            $stmt2->bind_param("ss", $otp, $boothId);
+            $stmt2->execute();
+
+            $stmt2->close();
 
             //SHOW APPROPRIATE VOTING PANEL
             $response['sub']=showPanelOptions($INTERNAL_AUTH_KEY, $conn, $boothId);
@@ -82,16 +90,6 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         {
             $stmt->close();
         }                
-
-
-        $otp=generateOtp($INTERNAL_AUTH_KEY);
-        $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
-
-        $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
-        $stmt2->bind_param("ss", $otp, $boothId);
-        $stmt2->execute();
-
-        $stmt2->close();
         
     }
         
