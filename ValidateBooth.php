@@ -46,13 +46,13 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 	$stmt2->bind_param("s",$booth_id);
 	$stmt2->execute();
 	$stmt2->bind_result($count,$loginState,$otpsent,$smsCount);
-	$stmt2->fetch();
-	$stmt2->close();
+    $stmt2->fetch();
+    $stmt2->close();
 	
 	if($count==1)
 	{
 		$response['validBooth']=true;
-		$count=-1;
+        $count=-1;
 
         if($loginState==0)
         {
@@ -63,7 +63,7 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
             if($otp==$otpsent && $smsCount<=4)
             {
                 $response['success']=true;
-		$smsCount=0;
+				$smsCount=0;
 
                 $stmt3=$conn->prepare("UPDATE Booth SET status=1,sms_count=? WHERE booth_id=?");
                 $stmt3->bind_param("ds",$smsCount,$booth_id);
@@ -73,19 +73,14 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
             elseif($otp!=$otpsent && $smsCount>=4)
             {
                 $stmt4=$conn->prepare("UPDATE Booth SET status=2 WHERE booth_id=?");
-		$stmt4->bind_param("s",$booth_id);
-		$stmt4->execute();
-		$stmt4->close();
+				$stmt4->bind_param("s",$booth_id);
+				$stmt4->execute();
+				$stmt4->close();
 				
-		$response['boothSuspended']=true;
+				$response['boothSuspended']=true;
             }
 
-            $times=mt_rand(1,12);
-            while($times>0)
-            {
-                $otp=mt_rand(1000, mt_rand(1001,9999));
-                $times--;
-            }
+            $otp=generateOtp($INTERNAL_AUTH_KEY);
 
             $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
 
@@ -98,7 +93,7 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 	}
 }
 else
-$stmt->close();
+    $stmt->close();
 $conn->close();
 
 echo json_encode($response);
