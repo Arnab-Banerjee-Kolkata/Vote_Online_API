@@ -64,13 +64,21 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$stmt4=$conn->prepare("DELETE FROM Govt_Approval WHERE election_id=? AND booth_id=?");
 			$stmt4->bind_param("ds",$electionId,$boothId);
 			$stmt4->execute();
-
-            if($conn->affected_rows == 1)
-            {
-                $response['success']=true;
-            }
             $stmt4->fetch();
             $stmt4->close();
+            
+            if($conn->affected_rows == 1)
+            {
+                $otp=generateOtp($INTERNAL_AUTH_KEY);
+                $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
+
+                $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
+                $stmt2->bind_param("ss", $otp, $boothId);
+                $stmt2->execute();
+                $stmt2->close();
+
+                $response['success']=true;
+            }
         }
 		else
 		{
