@@ -107,13 +107,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
                     $stmt6->close();
                 }
                 
-                $times=mt_rand(1,12);
-                while($times>0)
-                {
-                    $newOtp=mt_rand(1000, mt_rand(1001,9999));
-                    $times--;
-                }
-
+                $newOtp=generateOtp($INTERNAL_AUTH_KEY);
                 $newOtp=encrypt($INTERNAL_AUTH_KEY, $newOtp, $keySet[8]);
     
                 $stmt7=$conn->prepare("UPDATE Credentials SET voter_otp=? WHERE aadhaar_no=?");
