@@ -84,13 +84,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         }                
 
 
-        $times=mt_rand(1,12);
-        while($times>0)
-        {
-            $otp=mt_rand(1000, mt_rand(1001,9999));
-            $times--;
-        }
-
+        $otp=generateOtp($INTERNAL_AUTH_KEY);
         $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
 
         $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
