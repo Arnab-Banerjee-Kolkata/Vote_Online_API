@@ -30,7 +30,7 @@ $key_name="post_auth_key";
 $response=array();
 $response['success']=false;
 $response['validAuth']=false;
-$response['validAdmin']=true;
+$response['validAdmin']=false;
 $response['validCombination']=false;
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
