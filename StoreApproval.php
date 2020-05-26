@@ -108,9 +108,9 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
                 $count=-1;
                 $response['validVoterStatus']=true;
 			
-                $stmt9=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name)
-                VALUES (?,?,?)");
-                $stmt9->bind_param("dss",$phaseId,$boothId,$lsConst);
+                $stmt9=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name,approved_at)
+                VALUES (?,?,?,?)");
+                $stmt9->bind_param("dsss",$phaseId,$boothId,$lsConst,date("Y-m-d H:i:s"));
                 $stmt9->execute();
                 $stmt9->fetch();
                 $stmt9->close();
