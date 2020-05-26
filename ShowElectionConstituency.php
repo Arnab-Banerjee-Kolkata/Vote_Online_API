@@ -20,7 +20,7 @@ if ($conn->connect_error) {
 
 
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
-$electionId=$conn->real_escape_string($_POST["electionId"]);
+$stateElectionId=$conn->real_escape_string($_POST["stateElectionId"]);
 $adminId=$conn->real_escape_string($_POST["adminId"]);
 
 
@@ -57,20 +57,32 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $response['validAdmin']=true;
         $count=-1;
 
-        $stmt=$conn->prepare("SELECT state_code, phase_code FROM Pub_Govt_Election WHERE id=?");
-        $stmt->bind_param("d", $electionId);
+        $stmt=$conn->prepare("SELECT COUNT(id), state_code, type FROM State_Election WHERE id=?");
+        $stmt->bind_param("d", $stateElectionId);
         $stmt->execute();
-        $stmt->bind_result($stateCode, $phaseCode);
+        $stmt->bind_result($count, $stateCode, $type);
+        $stmt->fetch();
+        $stmt->close();
 
-        if($stmt->fetch())
+        if($count==1)
         {
-            $stmt->close();
             $response['validElection']=true;
+            $count=-1;
 
             $constituencyList=array();
 
-            $stmt=$conn->prepare("SELECT name FROM Constituency WHERE state_code=? AND phase_code=?");
-            $stmt->bind_param("ss",$stateCode, $phaseCode);
+            $pattern="";
+            if($type=="LOK SABHA")
+            {
+                $pattern='LS%';
+            }
+            else if($type="VIDHAN SABHA")
+            {
+                $pattern='VS%';
+            }
+
+            $stmt=$conn->prepare("SELECT name FROM Constituency WHERE state_code=? AND phase_code LIKE ?");
+            $stmt->bind_param("ss",$stateCode, $pattern);
             $stmt->execute();
             $stmt->bind_result($name);
 
