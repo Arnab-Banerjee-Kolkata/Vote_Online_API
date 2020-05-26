@@ -13,6 +13,8 @@ foreach($_POST as $element)
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
+date_default_timezone_set("Asia/Kolkata");
+
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: ");
@@ -86,6 +88,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
                 $minutes += $minsPassed->h * 60;
                 $minutes += $minsPassed->i;
 
+                //echo $minutes."   ".$APPROVAL_MINUTES."<br>";
                 if($minutes>=$APPROVAL_MINUTES)
                 {
                     $stmt=$conn->prepare("DELETE FROM Govt_Approval WHERE booth_id=?");
@@ -143,10 +146,6 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt7->bind_param("ss",$newOtp,$aadhaarNo);
                 $stmt7->execute();
                 $stmt7->close();
-            }
-            else
-            {
-                $stmt5->close();
             }
 			
 		}
