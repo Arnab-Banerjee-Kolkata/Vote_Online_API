@@ -89,6 +89,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $count=-1;
                 $response['validElection']=true;
 
+                $pattern="";
                 if($type=="LOK SABHA")
                 {
                     $pattern='LS%';
