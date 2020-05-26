@@ -12,6 +12,8 @@ foreach($_POST as $element)
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
+date_default_timezone_set("Asia/Kolkata");
+
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: ");
@@ -80,6 +82,39 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $stmt2->execute();
 
             $stmt2->close();
+
+
+            //REMOVES EXPIRED APPROVAL
+            $stmt5=$conn->prepare("SELECT COUNT(booth_id), approved_at FROM Govt_Approval WHERE booth_id=?");
+            $stmt5->bind_param("s",$boothId);
+            $stmt5->execute();
+            $stmt5->bind_result($count4, $approvedAt);
+            $stmt5->fetch();
+            $stmt5->close();
+
+            if($count4==1)
+            {
+                $approvedAt=new DateTime($approvedAt);
+                $currentTime=new DateTime(date("Y-m-d H:i:s"));
+                $minsPassed=$approvedAt->diff($currentTime);
+
+                $minutes = $minsPassed->days * 24 * 60;
+                $minutes += $minsPassed->h * 60;
+                $minutes += $minsPassed->i;
+
+                //echo $minutes."   ".$APPROVAL_MINUTES."<br>";
+                if($minutes>=$APPROVAL_MINUTES)
+                {
+                    $stmt=$conn->prepare("DELETE FROM Govt_Approval WHERE booth_id=?");
+                    $stmt->bind_param("s", $boothId);
+                    $stmt->execute();
+                    $stmt->fetch();
+                    $stmt->close();
+
+                    $count4=0;
+                }
+            }
+
 
             //SHOW APPROPRIATE VOTING PANEL
             $response['sub']=showPanelOptions($INTERNAL_AUTH_KEY, $conn, $boothId);
