@@ -5,7 +5,7 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
 	include 'Credentials.php';
     include 'GarbageAndVoted.php';
 
-
+    date_default_timezone_set("Asia/Kolkata");
 
 
     $internalAuthKey=$conn->real_escape_string($internalAuthKey);
@@ -60,9 +60,9 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
                 $count=-1;
                 $response['validVoterStatus']=true;
 
-                $stmt4=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name) 
-                VALUES (?,?,?)");
-                $stmt4->bind_param("dss",$phaseId,$boothId,$vsConst);
+                $stmt4=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name,approved_at) 
+                VALUES (?,?,?,?)");
+                $stmt4->bind_param("dsss",$phaseId,$boothId,$vsConst,date("Y-m-d H:i:s"));
                 $stmt4->execute();
                 $stmt4->close();
                 
