@@ -45,10 +45,10 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 	$stmt->close();
 	$response['validAuth']=true;
 	
-	$stmt2=$conn->prepare("SELECT COUNT(booth_id), otp FROM Booth WHERE booth_id=? AND status=1");
+	$stmt2=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=? AND status=1");
 	$stmt2->bind_param("s",$boothId);
 	$stmt2->execute();
-	$stmt2->bind_result($count1, $boothOtp);
+	$stmt2->bind_result($count1);
 	
 	if($stmt2->fetch() && $count1==1)
 	{
@@ -90,15 +90,21 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
                 if($stmt6->fetch() && $voterOtp==$otp)
                 {
                     $stmt6->close();
-                    $response['validOtp']=true;
-
-                    //return booth OTP
-                    $boothOtp=decrypt($INTERNAL_AUTH_KEY, $boothOtp, $keySet[8]);                        
+                    $response['validOtp']=true;                      
 
                     //StoreApproval
                     $response['returnValue']=storeApproval($conn,$INTERNAL_AUTH_KEY,$aadhaarNo,$electionId,$type,$boothId);
                     if($response['returnValue']['garbageVoted']['success'])
                     {
+                        $boothOtp=generateOtp($INTERNAL_AUTH_KEY);
+                        $enOtp=encrypt($INTERNAL_AUTH_KEY, $boothOtp, $keySet[8]);
+
+                        $stmt=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=? AND status=1");
+                        $stmt->bind_param("ss", $enOtp, $boothId);
+                        $stmt->execute();
+                        $stmt->fetch();
+                        $stmt->close();  
+
                         $response['boothOtp']=$boothOtp;
                     }
                 }
