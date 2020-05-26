@@ -21,7 +21,7 @@ if ($conn->connect_error) {
 
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $name=$conn->real_escape_string($_POST["name"]);
-$electionId=$conn->real_escape_string($_POST["electionId"]);
+$stateElectionId=$conn->real_escape_string($_POST["stateElectionId"]);
 $constituencyName=$conn->real_escape_string($_POST["constituencyName"]);
 $partyName=$conn->real_escape_string($_POST["partyName"]);
 $img=$conn->real_escape_string($_POST["img"]);
@@ -77,29 +77,49 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $stmt->close();
             $response['validParty']=true;
 
-            $stmt=$conn->prepare("SELECT state_code, phase_code FROM Pub_Govt_Election WHERE id=? AND status=0");
-            $stmt->bind_param("d", $electionId);
+            $stmt=$conn->prepare("SELECT COUNT(id), state_code, type FROM State_Election WHERE id=? AND status=0");
+            $stmt->bind_param("d", $stateElectionId);
             $stmt->execute();
-            $stmt->bind_result($stateCode, $phaseCode);
+            $stmt->bind_result($count, $stateCode, $type);
+            $stmt->fetch();
+            $stmt->close();
 
-            if($stmt->fetch())
+            if($count==1)
             {        
-                $stmt->close();
+                $count=-1;
                 $response['validElection']=true;
 
-                $stmt=$conn->prepare("SELECT COUNT(name) FROM Constituency WHERE state_code=? AND phase_code=? AND name=?");
-                $stmt->bind_param("sss", $stateCode, $phaseCode, $constituencyName);
-                $stmt->execute();
-                $stmt->bind_result($count);
+                if($type=="LOK SABHA")
+                {
+                    $pattern='LS%';
+                }
+                else if($type=="VIDHAN SABHA")
+                {
+                    $pattern='VS%';
+                }
 
-                if($stmt->fetch() && $count==1)
+                $stmt=$conn->prepare("SELECT COUNT(name), phase_code FROM Constituency WHERE state_code=? AND name=? AND phase_code LIKE ?");
+                $stmt->bind_param("sss", $stateCode, $constituencyName, $pattern);
+                $stmt->execute();
+                $stmt->bind_result($count, $phaseCode);
+                $stmt->fetch();
+                $stmt->close();
+
+                if($count==1)
                 {
                     $count=-1;
-                    $stmt->close();
                     $response['validConstituency']=true;
 
+                    $stmt=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE state_code=? AND phase_code=? AND status=0");
+                    $stmt->bind_param("ss", $stateCode, $phaseCode);
+                    $stmt->execute();
+                    $stmt->bind_result($phaseElectionId);
+                    $stmt->fetch();
+                    $stmt->close();
+
+
                     $stmt=$conn->prepare("SELECT COUNT(id) FROM Candidate WHERE election_id=? AND constituency_name=? AND party_name=?");
-                    $stmt->bind_param("dss", $electionId, $constituencyName, $partyName);
+                    $stmt->bind_param("dss", $phaseElectionId, $constituencyName, $partyName);
                     $stmt->execute();
                     $stmt->bind_result($count);
 
@@ -110,14 +130,14 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                         $response['validCandidate']=true;
 
                         $stmt=$conn->prepare("INSERT INTO Candidate (name, election_id, constituency_name, party_name, img) VALUES (?, ?, ?, ?, ?)");
-                        $stmt->bind_param("sdsss", $name, $electionId, $constituencyName, $partyName, $img);                
+                        $stmt->bind_param("sdsss", $name, $phaseElectionId, $constituencyName, $partyName, $img);                
 
                         if($stmt->execute())
                         {
                             $stmt->close();
 
                             $stmt=$conn->prepare("SELECT id FROM Candidate WHERE election_id=? AND party_name=? AND constituency_name=?");
-                            $stmt->bind_param("dss", $electionId, $partyName, $constituencyName);
+                            $stmt->bind_param("dss", $phaseElectionId, $partyName, $constituencyName);
                             $stmt->execute();
                             $stmt->bind_result($candidateId);
                             $stmt->fetch();
