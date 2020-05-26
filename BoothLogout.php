@@ -48,11 +48,21 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 		$stmt2->close();
 		$response['validBooth']=true;
 
-        $stmt=$conn->prepare("UPDATE Booth SET status=0 WHERE booth_id=? AND status=1");
+        $stmt=$conn->prepare("UPDATE Booth SET status=0 WHERE booth_id=? AND (status=1 OR status=0)");
         $stmt->bind_param("s", $booth_id);
         $stmt->execute();
         
         $stmt->close();
+
+        $otp=generateOtp($INTERNAL_AUTH_KEY);
+        $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
+
+        $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
+        $stmt2->bind_param("ss", $otp, $boothId);
+        $stmt2->execute();
+
+        $stmt2->close();
+
         $response['success']=true;		
 	}
 }
