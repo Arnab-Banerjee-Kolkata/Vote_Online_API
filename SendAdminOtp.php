@@ -69,6 +69,15 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 {
 	$stmt->close();
 	$response['validAuth']=true;
+
+    $otp1=generateOtp($INTERNAL_AUTH_KEY);
+    $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[38]);
+    
+    $stmt3=$conn->prepare("UPDATE Admin_Credentials SET OTP=?,otpCount=0 WHERE id=?");
+    $stmt3->bind_param("ss",$otp1,$adminId);
+    $stmt3->execute();
+    $stmt3->close();
+
 	
 	$stmt2=$conn->prepare("SELECT COUNT(id),phone_number,OTP,sms_count FROM Admin_Credentials WHERE id=? AND status=0 AND sms_count<4");
 	$stmt2->bind_param("s",$adminId);
