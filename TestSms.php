@@ -98,6 +98,14 @@ if($count==1)
     {      
             $stmt->close();
 
+            $newOtp=generateOtp($INTERNAL_AUTH_KEY);
+            $newOtp=encrypt($INTERNAL_AUTH_KEY, $newOtp, $keySet[8]);
+
+            $stmt7=$conn->prepare("UPDATE Credentials SET voter_otp=? WHERE aadhaar_no=?");
+            $stmt7->bind_param("ss",$newOtp,$aadhaarNo);
+            $stmt7->execute();
+            $stmt7->close();
+
             $stmt2=$conn->prepare("SELECT voter_otp from Credentials where aadhaar_no=?");
             $stmt2->bind_param("s", $aadhaarNo);
             
