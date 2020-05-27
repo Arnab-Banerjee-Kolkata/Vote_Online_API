@@ -69,6 +69,17 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 {
 	$stmt->close();
 	$response['validAuth']=true;
+
+
+    $otp=generateOtp($INTERNAL_AUTH_KEY);
+
+    $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
+
+    $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
+    $stmt2->bind_param("ss", $otp, $boothId);
+    $stmt2->execute();
+    $stmt2->close();
+
 	
 	$stmt2=$conn->prepare("SELECT COUNT(booth_id),phone_number,otp,sms_count FROM Booth WHERE booth_id=? AND status=0 AND sms_count<4");
 	$stmt2->bind_param("s",$boothId);
