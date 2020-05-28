@@ -4,14 +4,14 @@ require('textlocal.class.php');
 require('Credentials.php');
 include 'Credentials.php';
 include 'Protection.php';
+include 'EncryptionKeys.php';
 
-function sendOTP($conn, $internalAuthKey, $countryCode, $regMobNo, $adminOTP, $API_KEY)
+function sendOTP($conn, $internalAuthKey, $countryCode, $regMobNo, $adminOTP, $API_KEY, $key)
 {
-    include 'Credentials.php';    
-    include 'EncryptionKeys.php';     
+    include 'Credentials.php';        
     if($internalAuthKey==$INTERNAL_AUTH_KEY)    
     {
-        $adminOTP=decrypt($internalAuthKey, $adminOTP, $keySet[38]);        
+        $adminOTP=decrypt($internalAuthKey, $adminOTP, $key);        
         $Textlocal = new Textlocal(false, false, $API_KEY);
         $numbers = array($countryCode.$regMobNo);        
         $sender = 'RMVOTE';        
@@ -91,7 +91,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		
 		$response['validAdmin']=true;
 		
-		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$adminOTP,$API_KEY);
+		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$adminOTP,$API_KEY, $keySet[38]);
 		
 		$stmt4=$conn->prepare("UPDATE Admin_Credentials SET sms_count=? WHERE id=?");
 		$stmt4->bind_param("ds",++$smsCount,$adminId);
