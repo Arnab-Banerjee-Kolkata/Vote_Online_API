@@ -5,15 +5,15 @@ require('Credentials.php');
 
 include 'Credentials.php';
 include 'Protection.php';
+include 'EncryptionKeys.php';
 
-function sendOTP($conn, $internalAuthKey, $countryCode, $regMobNo, $voterOTP, $API_KEY)
+function sendOTP($conn, $internalAuthKey, $countryCode, $regMobNo, $voterOTP, $API_KEY, $key)
 {
     include 'Credentials.php';
-    include 'EncryptionKeys.php';
  
     if($internalAuthKey==$INTERNAL_AUTH_KEY)
     {
-        $voterOTP=decrypt($internalAuthKey, $voterOTP, $keySet[8]);
+        $voterOTP=decrypt($internalAuthKey, $voterOTP, $key);
         $Textlocal = new Textlocal(false, false, $API_KEY);
 
         $numbers = array($countryCode.$regMobNo);
@@ -199,7 +199,7 @@ if($count==1)
                                     $response['validLimit']=true;                                    
                                     $smsCount++;
 
-                                    if(sendOTP($conn, $INTERNAL_AUTH_KEY, $countryCode, $regMobNo, $voterOTP, $API_KEY))
+                                    if(sendOTP($conn, $INTERNAL_AUTH_KEY, $countryCode, $regMobNo, $voterOTP, $API_KEY, $keySet[8]))
                                     {
                                         if($count==0)
                                         {
