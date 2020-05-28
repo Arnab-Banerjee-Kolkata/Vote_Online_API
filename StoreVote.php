@@ -95,7 +95,39 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         {
             $count1=-1;
             $count2=-1;
-            $response['validIntegrity']=true;         
+            $response['validIntegrity']=true;      
+
+
+            //REMOVES EXPIRED APPROVAL
+            $stmt5=$conn->prepare("SELECT COUNT(booth_id), approved_at FROM Govt_Approval WHERE booth_id=?");
+            $stmt5->bind_param("s",$boothId);
+            $stmt5->execute();
+            $stmt5->bind_result($count4, $approvedAt);
+            $stmt5->fetch();
+            $stmt5->close();
+
+            if($count4==1)
+            {
+                $approvedAt=new DateTime($approvedAt);
+                $currentTime=new DateTime(date("Y-m-d H:i:s"));
+                $minsPassed=$approvedAt->diff($currentTime);
+
+                $minutes = $minsPassed->days * 24 * 60;
+                $minutes += $minsPassed->h * 60;
+                $minutes += $minsPassed->i;
+
+                //echo $minutes."   ".$APPROVAL_MINUTES."<br>";
+                if($minutes>=$APPROVAL_MINUTES)
+                {
+                    $stmt=$conn->prepare("DELETE FROM Govt_Approval WHERE booth_id=?");
+                    $stmt->bind_param("s", $boothId);
+                    $stmt->execute();
+                    $stmt->fetch();
+                    $stmt->close();
+
+                    $count4=0;
+                }
+            }   
 
 
             $stmt=$conn->prepare("SELECT COUNT(booth_id) FROM Govt_Approval WHERE booth_id=? AND election_id=? AND constituency_name=?");
