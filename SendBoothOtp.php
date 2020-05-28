@@ -4,14 +4,14 @@ require('textlocal.class.php');
 require('Credentials.php');
 include 'Credentials.php';
 include 'Protection.php';
+include 'EncryptionKeys.php';
 
-function sendOTP($conn, $internalAuthKey, $countryCode, $regMobNo, $boothOTP, $API_KEY)
+function sendOTP($conn, $internalAuthKey, $countryCode, $regMobNo, $boothOTP, $API_KEY, $key)
 {
-    include 'Credentials.php';    
-    include 'EncryptionKeys.php';     
+    include 'Credentials.php';      
     if($internalAuthKey==$INTERNAL_AUTH_KEY)    
     {
-        $boothOTP=decrypt($internalAuthKey, $boothOTP, $keySet[8]);        
+        $boothOTP=decrypt($internalAuthKey, $boothOTP, $key);        
         $Textlocal = new Textlocal(false, false, $API_KEY);
         $numbers = array($countryCode.$regMobNo);        
         $sender = 'RMVOTE';        
@@ -32,6 +32,7 @@ function sendOTP($conn, $internalAuthKey, $countryCode, $regMobNo, $boothOTP, $A
     }    
     return false;
 }
+
 
 foreach($_POST as $element)
 {
@@ -93,7 +94,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		
 		$response['validBooth']=true;
 		
-		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$boothOTP,$API_KEY);
+		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$boothOTP,$API_KEY, $keySet[8]);
 		
 		$stmt4=$conn->prepare("UPDATE Booth SET sms_count=? WHERE booth_id=?");
 		$stmt4->bind_param("ds",++$smsCount,$boothId);
