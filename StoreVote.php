@@ -8,10 +8,12 @@ foreach($_POST as $element)
 {
     checkForbiddenPhrase($INTERNAL_AUTH_KEY, $element);
 }
+
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 $vbConn=new mysqli($vbServerName, $vbUserName, $vbPassword, $vbDbName);
 
+date_default_timezone_set("Asia/Kolkata");
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: ");
