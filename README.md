@@ -23,6 +23,10 @@
     1: Logged in<br>
     2: Suspended<br>
 <br>
+<b>Party symbol status::</b><br>
+    0: Available<br>
+    1: Taken<br>
+<br>
 <br>
 <br>
 <b>INSTRUCTIONS TO CLONE THIS REPO</b><br>
