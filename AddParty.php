@@ -84,6 +84,14 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt=$conn->prepare("INSERT INTO Party (name, symbol) VALUES (?, ?)");
                 $stmt->bind_param("ss", $name, $symbol);
                 $stmt->execute();
+                $stmt->fetch();
+                $stmt->close();
+
+                $stmt=$conn->prepare("UPDATE Symbol SET status=1 WHERE path=?");
+                $stmt->bind_param("s", $symbol);
+                $stmt->execute();
+                $stmt->fetch();
+                $stmt->close();
 
 
                 $response['success']=true;            
