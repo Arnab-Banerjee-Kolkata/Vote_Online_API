@@ -48,10 +48,10 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		$stmt2->close();
 		$response['validPlace']=true;
 
-		$stmt3=$conn->prepare("SELECT locality,address,land_mark FROM Booth WHERE place=? AND (status=0 OR status=1) ORDER BY locality");
+		$stmt3=$conn->prepare("SELECT locality,address,land_mark,map_link FROM Booth WHERE place=? AND (status=0 OR status=1) ORDER BY locality");
 		$stmt3->bind_param("s",$place);
 		$stmt3->execute();
-		$stmt3->bind_result($area,$address,$landmark);
+		$stmt3->bind_result($area,$address,$landmark,$mapLink);
 	
 		$allBoothsInPlace=array();
 	
@@ -61,6 +61,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$boothAddress['area']=$area;
 			$boothAddress['address']=$address;
 			$boothAddress['landmark']=$landmark;
+            $boothAddress['mapLink']=$mapLink;
 		
 			array_push($allBoothsInPlace,$boothAddress);
 		}
