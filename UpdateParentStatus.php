@@ -124,7 +124,7 @@ function updateParentStatus($internalAuthKey, $conn, $countryElectionId, $stateE
         }
         
     
-        $validOp=true;
+        $validParentOp=true;
     }
     
     return $validParentOp;
