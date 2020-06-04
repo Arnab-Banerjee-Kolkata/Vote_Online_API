@@ -5,7 +5,6 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
     include 'Credentials.php';
     include 'EncryptionKeys.php';
     include 'UpdateParentStatus.php';
-    include 'Protection.php';
     
     
     $vbConn=new mysqli($vbServerName, $vbUserName, $vbPassword, $vbDbName);
