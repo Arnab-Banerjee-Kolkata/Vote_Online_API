@@ -36,12 +36,8 @@ function updateParentStatus($internalAuthKey, $conn, $countryElectionId, $stateE
 
         //Calculate total constituencies in the current phase and store in count2
 
-        $stmt=$conn->prepare("SELECT COUNT(name) FROM Constituency WHERE state_code = (
-    SELECT state_code FROM Constituency WHERE name=?    
-) AND phase_code = (
-    SELECT phase_code FROM Constituency WHERE name=? 
-)");
-        $stmt->bind_param("ss", $constituencyName, $constituencyName);
+        $stmt=$conn->prepare("SELECT COUNT(DISTINCT(constituency_name)) FROM Candidate WHERE election_id=?");
+        $stmt->bind_param("d", $phaseElectionId);
         $stmt->execute();
         $stmt->bind_result($count2);
         $stmt->fetch();
@@ -113,7 +109,7 @@ function updateParentStatus($internalAuthKey, $conn, $countryElectionId, $stateE
                 }
             }
         }
-        else if($count>$count1 && $count1>0)    //else if there is a tie then change status to 5
+        else if($count>$count1)    //else if there is a tie then change status to 5
         {
             $stmt=$conn->prepare("UPDATE Pub_Govt_Election SET status=5 WHERE id=?");
             $stmt->bind_param("d", $phaseElectionId);
