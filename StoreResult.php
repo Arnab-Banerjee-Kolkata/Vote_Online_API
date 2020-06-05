@@ -28,6 +28,7 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
     $response['success']=false;
     $response['validInternalAuth']=false;
     $response['validParentOp']=false;
+    $response['tie']=true;
 
 
 
@@ -226,8 +227,8 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
                 
             }
         }
-        
-        
+        $response['tie']=false;
+        end:
         $response['validParentOp']=updateParentStatus($INTERNAL_AUTH_KEY, $conn, $countryElectionId, $stateElectionId, $phaseElectionId, $type, $constituencyName);
         
         
@@ -238,7 +239,6 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
         }
         
     }
-    end:
     
     $vbConn->close();
         
