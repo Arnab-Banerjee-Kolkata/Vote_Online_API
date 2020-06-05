@@ -59,9 +59,15 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
             $a=-1;
             $voteCount=0;
             foreach($keySet as $key)
-            {
+            {                
                 $a++;
-                $enVote=$key[strval($a)];
+                $strA=strval($a);
+                $enVote="";
+                for($c=0; $c<strlen($strA);$c++)
+                {
+                    $enVote=$enVote.$key[$strA[$c]];
+                }
+
                 for($b=0; $b<$len; $b++)
                 {
                     $enVote=$enVote.$key[$candidateId[$b]];
@@ -73,16 +79,26 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
                 $stmt->bind_result($sumVote);
                 $stmt->fetch();
                 $stmt->close();
+
                 
                 if($sumVote==null || $sumVote=='')
                     $sumVote=0;
                 $voteCount=$voteCount+$sumVote;
+
             }
             array_push($votes, $voteCount);
             if($voteCount>$highest)
             {
                 $highest=$voteCount;
             }
+            //Store number of votes received by each candidate
+
+            $stmt=$conn->prepare("INSERT INTO Govt_Result (state_election_id, constituency_name, no_of_votes, candidate_id) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("dsdd", $stateElectionId, $constituencyName, $voteCount, $canId);
+            $stmt->execute();
+            $stmt->fetch();
+            $stmt->close();
+
         }
         //Find candidate with highest votes. Store his/her id and number of votes
         $canCount=0;
@@ -102,8 +118,9 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
             }
         }
         
-        if($canCount!=1)
+        if($canCount!=1){
             goto end;
+        }
         
         $stmt=$conn->prepare("SELECT party_name FROM Candidate WHERE id=?");
         $stmt->bind_param("d", $highestCanId);
@@ -133,7 +150,7 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
                 
                 
             }
-            else        //State and country
+            else if($type=="LOK SABHA")        //State and country
             {
                 $stmt=$conn->prepare("INSERT INTO State_Election_Result (state_election_id, party_name, seats_won, country_election_id) VALUES (?, ?, 1, ?)");
                 $stmt->bind_param("dsd", $stateElectionId, $partyName, $countryElectionId);
@@ -154,7 +171,7 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
                 
                 if($seatsWon==null || $seatsWon=='')    //Country does not have party
                 {
-                    $stmt=$conn->prepare("INSERT INTO Coountry_Election_Result (country_election_id, party_name, seats_won) VALUES (?, ?, 1)");
+                    $stmt=$conn->prepare("INSERT INTO Country_Election_Result (country_election_id, party_name, seats_won) VALUES (?, ?, 1)");
                     $stmt->bind_param("ds", $countryElectionId, $partyName);
                     $stmt->execute();
                     $stmt->fetch();
