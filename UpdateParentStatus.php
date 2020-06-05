@@ -16,7 +16,6 @@ function updateParentStatus($internalAuthKey, $conn, $countryElectionId, $stateE
     $validParentOp=false;
     if($internalAuthKey==$INTERNAL_AUTH_KEY)
     {
-    
     //CHECK IF THE CURRENT PHASE IS COMPLETE
 
         $count=-1;
@@ -88,7 +87,7 @@ function updateParentStatus($internalAuthKey, $conn, $countryElectionId, $stateE
                 {
                     $count=$count1=-1;
                     
-                    $stmt=$conn->prepare("SELECT COUNT(id) FROM State_Election WHERE country_election_id=1 AND status=3");
+                    $stmt=$conn->prepare("SELECT COUNT(id) FROM State_Election WHERE country_election_id=? AND status=3");
                     $stmt->bind_param("d", $countryElectionId);
                     $stmt->execute();
                     $stmt->bind_result($count);
@@ -96,7 +95,7 @@ function updateParentStatus($internalAuthKey, $conn, $countryElectionId, $stateE
                     $stmt->close();
                     
                     
-                    $stmt=$conn->prepare("SELECT COUNT(id) FROM State_Election WHERE country_election_id=1");
+                    $stmt=$conn->prepare("SELECT COUNT(id) FROM State_Election WHERE country_election_id=?");
                     $stmt->bind_param("d", $countryElectionId);
                     $stmt->execute();
                     $stmt->bind_result($count1);
