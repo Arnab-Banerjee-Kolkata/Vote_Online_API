@@ -39,7 +39,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt3->close();
     $response['validAuth']=true;
 
-    $stmt=$conn->prepare("SELECT id, name, status, year FROM Country_Election WHERE status= 2 OR status=3");
+    $stmt=$conn->prepare("SELECT id, name, status, year FROM Country_Election WHERE status= 2 OR status=3 ORDER BY year DESC");
 
     $stmt->execute();
     $stmt->bind_result($electionId, $name, $status, $year);
@@ -62,7 +62,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt->close();
 
 
-    $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.status, State_Election.year, State.name FROM State_Election, State WHERE (status=2 OR status=3) AND (country_election_id IS NULL OR country_election_id='') AND State.code=State_Election.state_code");
+    $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.status, State_Election.year, State.name FROM State_Election, State WHERE (status=2 OR status=3) AND (country_election_id IS NULL OR country_election_id='') AND State.code=State_Election.state_code ORDER BY State_Election.year DESC");
 
     $stmt->execute();
     $stmt->bind_result($electionId, $name, $status, $year, $stateName);
