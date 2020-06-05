@@ -97,10 +97,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 }
                 $stmt->close();
 
-                $stmt=$conn->prepare("SELECT COUNT(name) FROM Constituency WHERE state_code = ? AND phase_code IN (
-	SELECT code FROM Phase WHERE state_code = ? AND type=?
+                $stmt=$conn->prepare("SELECT COUNT(DISTINCT(constituency_name)) FROM Candidate WHERE election_id IN (
+	SELECT id FROM Pub_Govt_Election WHERE state_election_id=?	    
 )");
-                $stmt->bind_param("sss", $stateCode, $stateCode, $type);
+                $stmt->bind_param("d", $electionId);
                 $stmt->execute();
                 $stmt->bind_result($response['totalSeats']);
                 $stmt->fetch();
@@ -151,10 +151,12 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 }
                 $stmt->close();
 
-                $stmt=$conn->prepare("SELECT COUNT(name) FROM Constituency WHERE state_code = ? AND phase_code IN (
-	SELECT code FROM Phase WHERE state_code = ? AND type=?
+                $stmt=$conn->prepare("SELECT COUNT(DISTINCT(constituency_name)) FROM Candidate WHERE election_id IN (
+	SELECT id FROM Pub_Govt_Election WHERE state_election_id= (
+    	    SELECT id FROM State_Election WHERE state_code=? AND country_election_id=?
+    )
 )");
-                $stmt->bind_param("sss", $stateCode, $stateCode, $type);
+                $stmt->bind_param("sd", $stateCode, $electionId);
                 $stmt->execute();
                 $stmt->bind_result($response['totalSeats']);
                 $stmt->fetch();
@@ -201,10 +203,12 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 }
                 $stmt->close();
 
-                $stmt=$conn->prepare("SELECT COUNT(name) FROM Constituency WHERE phase_code IN (
-	SELECT code FROM Phase WHERE type=?
+                $stmt=$conn->prepare("SELECT COUNT(DISTINCT(constituency_name)) FROM Candidate WHERE election_id IN (
+	SELECT id FROM Pub_Govt_Election WHERE state_election_id IN (
+    	    SELECT id FROM State_Election WHERE country_election_id=?
+    )
 )");
-                $stmt->bind_param("s", $type);
+                $stmt->bind_param("d", $electionId);
                 $stmt->execute();
                 $stmt->bind_result($response['totalSeats']);
                 $stmt->fetch();
