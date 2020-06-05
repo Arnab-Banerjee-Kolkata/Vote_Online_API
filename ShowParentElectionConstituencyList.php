@@ -78,7 +78,21 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 
                 $constituencyList=array();
 
-                $stmt=$conn->prepare("SELECT Constituency.name, State.name FROM Constituency, State WHERE Constituency.phase_code LIKE 'LS%' AND State.code=Constituency.state_code");
+                $stmt=$conn->prepare("SELECT DISTINCT(Candidate.constituency_name), State.name
+FROM Candidate
+INNER JOIN Constituency ON Candidate.constituency_name = Constituency.name
+INNER JOIN State ON Constituency.state_code=State.code
+WHERE Candidate.election_id IN (
+	SELECT id FROM Pub_Govt_Election WHERE state_election_id IN (
+    	    SELECT id FROM State_Election WHERE country_election_id=?
+    )
+) AND Constituency.name NOT IN (
+    SELECT DISTINCT(constituency_name) FROM Constituency_Result WHERE state_election_id IN (
+        SELECT id FROM State_Election WHERE country_election_id=?    
+    )    
+)
+");
+                $stmt->bind_param("dd", $electionId, $electionId);
                 $stmt->execute();
                 $stmt->bind_result($name, $stateName);
 
@@ -135,10 +149,12 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 
                 $constituencyList=array();
 
-                $stmt=$conn->prepare("SELECT name FROM Constituency WHERE phase_code LIKE 'VS%' AND state_code = (
-        SELECT state_code FROM State_Election WHERE id = ?    
-    )");
-                $stmt->bind_param("d",$electionId);
+                $stmt=$conn->prepare("SELECT DISTINCT(constituency_name) FROM Candidate WHERE election_id IN (
+	SELECT id FROM Pub_Govt_Election WHERE state_election_id=? AND constituency_name NOT IN (
+        SELECT DISTINCT(constituency_name) FROM Constituency_Result WHERE state_election_id=?
+    )	    
+)");
+                $stmt->bind_param("dd",$electionId, $electionId);
                 $stmt->execute();
                 $stmt->bind_result($name);
 
