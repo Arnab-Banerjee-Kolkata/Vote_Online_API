@@ -31,6 +31,7 @@ $response['validAuth']=false;
 $response['validType']=false;
 $response['validState']=false;
 $response['validElection']=false;
+$response['tieCount']=0;
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
 $stmt3->bind_param("s", $key_name);
@@ -107,6 +108,20 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 
                 $stmt->close();
 
+
+                $stmt=$conn->prepare("SELECT COUNT(ties) FROM (
+    SELECT constituency_name, COUNT(*) as ties FROM Constituency_Result 
+    WHERE state_election_id = ?
+    GROUP BY (constituency_name)
+    HAVING COUNT(*)>1    
+) t");
+                $stmt->bind_param("d", $electionId);
+                $stmt->execute();
+                $stmt->bind_result($response['tieCount']);
+                $stmt->fetch();
+                $stmt->close();
+
+
                 $response['success']=true;
 
                 $response['results']=$results;
@@ -161,7 +176,23 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->bind_result($response['totalSeats']);
                 $stmt->fetch();
 
-                $stmt->close();                
+                $stmt->close();     
+
+
+                $stmt=$conn->prepare("SELECT COUNT(ties) FROM (
+    SELECT constituency_name, COUNT(*) as ties FROM Constituency_Result 
+    WHERE state_election_id = (
+        SELECT id FROM State_Election WHERE country_election_id=? AND state_code=?    
+    ) 
+    GROUP BY (constituency_name)
+    HAVING COUNT(*)>1
+    
+) t");
+                $stmt->bind_param("ds", $electionId, $stateCode);
+                $stmt->execute();
+                $stmt->bind_result($response['tieCount']);
+                $stmt->fetch();
+                $stmt->close();           
 
                 $response['success']=true;
 
@@ -214,6 +245,23 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->fetch();
 
                 $stmt->close();
+
+
+                $stmt=$conn->prepare("SELECT COUNT(ties) FROM (
+    SELECT constituency_name, COUNT(*) as ties FROM Constituency_Result 
+    WHERE state_election_id IN (
+        SELECT id FROM State_Election WHERE country_election_id=?    
+    ) 
+    GROUP BY (constituency_name)
+    HAVING COUNT(*)>1
+    
+) t");
+                $stmt->bind_param("d", $electionId);
+                $stmt->execute();
+                $stmt->bind_result($response['tieCount']);
+                $stmt->fetch();
+                $stmt->close();
+
 
                 $response['success']=true;
 
