@@ -109,17 +109,24 @@ WHERE Candidate.election_id IN (
                 $response['constituencyList']=$constituencyList;
                 
                 
-                $stmt=$conn->prepare("SELECT DISTINCT(constituency_name) FROM Constituency_Result WHERE state_election_id IN (
+                $stmt=$conn->prepare("SELECT DISTINCT(Candidate.constituency_name), State.name 
+FROM Candidate 
+INNER JOIN Constituency ON Candidate.constituency_name = Constituency.name 
+INNER JOIN State ON Constituency.state_code=State.code
+WHERE Constituency.name IN (
+    SELECT DISTINCT(constituency_name) FROM Constituency_Result WHERE state_election_id IN (
         SELECT id FROM State_Election WHERE country_election_id=?    
-    )");        $stmt->bind_param("d", $electionId);
+    )    
+)");        $stmt->bind_param("d", $electionId);
                 $stmt->execute();
-                $stmt->bind_result($name);
+                $stmt->bind_result($name,$stateName);
                 
                 $declaredList=array();
                 while($stmt->fetch())
                 {
                     $constituency=array();
                     $constituency['name']=$name;
+                    $constituency['stateName']=$stateName;
                     
                     array_push($declaredList, $constituency);
                 }
