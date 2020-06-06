@@ -109,17 +109,27 @@ WHERE Candidate.election_id IN (
                 $response['constituencyList']=$constituencyList;
                 
                 
-                $stmt=$conn->prepare("SELECT DISTINCT(Candidate.constituency_name), State.name 
-FROM Candidate 
-INNER JOIN Constituency ON Candidate.constituency_name = Constituency.name 
-INNER JOIN State ON Constituency.state_code=State.code
-WHERE Constituency.name IN (
-    SELECT DISTINCT(constituency_name) FROM Constituency_Result WHERE state_election_id IN (
-        SELECT id FROM State_Election WHERE country_election_id=?    
-    )    
-)");        $stmt->bind_param("d", $electionId);
+                $stmt=$conn->prepare("SELECT constituency_name, state_name, constituency_count FROM (
+    SELECT DISTINCT(Candidate.constituency_name) as constituency_name, State.name as state_name 
+    FROM Candidate 
+    INNER JOIN Constituency ON Candidate.constituency_name = Constituency.name 
+    INNER JOIN State ON Constituency.state_code=State.code
+    WHERE Constituency.name IN (
+        SELECT DISTINCT(constituency_name) FROM Constituency_Result WHERE state_election_id IN (
+            SELECT id FROM State_Election WHERE country_election_id=?    
+        )    
+    )
+    
+) t1
+INNER JOIN (
+    SELECT DISTINCT(constituency_name) as declared_constituency, COUNT(constituency_name) as constituency_count FROM Constituency_Result WHERE state_election_id IN (
+            SELECT id FROM State_Election WHERE country_election_id=?    
+        ) GROUP BY constituency_name
+) t2 
+ON t1.constituency_name=t2.declared_constituency");
+                $stmt->bind_param("dd", $electionId, $electionId);
                 $stmt->execute();
-                $stmt->bind_result($name,$stateName);
+                $stmt->bind_result($name,$stateName,$winnerCount);
                 
                 $declaredList=array();
                 while($stmt->fetch())
@@ -127,6 +137,10 @@ WHERE Constituency.name IN (
                     $constituency=array();
                     $constituency['name']=$name;
                     $constituency['stateName']=$stateName;
+                    if($winnerCount>1)
+                        $constituency['tie']=true;
+                    else
+                        $constituency['tie']=false;
                     
                     array_push($declaredList, $constituency);
                 }
@@ -177,16 +191,20 @@ WHERE Constituency.name IN (
                 $response['constituencyList']=$constituencyList;
                 
                 
-                $stmt=$conn->prepare("SELECT DISTINCT(constituency_name) FROM Constituency_Result WHERE state_election_id=?");        
+                $stmt=$conn->prepare("SELECT DISTINCT(constituency_name), COUNT(constituency_name) FROM Constituency_Result WHERE state_election_id=? GROUP BY constituency_name");        
                 $stmt->bind_param("d", $electionId);
                 $stmt->execute();
-                $stmt->bind_result($name);
+                $stmt->bind_result($name, $winnerCount);
                 
                 $declaredList=array();
                 while($stmt->fetch())
                 {
                     $constituency=array();
                     $constituency['name']=$name;
+                    if($winnerCount>1)
+                        $constituency['tie']=true;
+                    else
+                        $constituency['tie']=false;
                     
                     array_push($declaredList, $constituency);
                 }
