@@ -80,7 +80,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 $count=-1;
 
-                $stmt=$conn->prepare("SELECT Constituency_Result.constituency_name, Candidate.name, Candidate.party_name, Party.symbol, Constituency_Result.winner_vote_count, Candidate.img FROM Constituency_Result, Candidate, Party WHERE Constituency_Result.state_election_id=? AND Constituency_Result.winner_candidate_id=Candidate.id AND Party.name=Candidate.party_name");
+                $stmt=$conn->prepare("SELECT Constituency_Result.constituency_name, Candidate.name, Candidate.party_name, Party.symbol, Constituency_Result.winner_vote_count, Candidate.img FROM Constituency_Result, Candidate, Party WHERE Constituency_Result.state_election_id=? AND Constituency_Result.winner_candidate_id=Candidate.id AND Party.name=Candidate.party_name ORDER BY Constituency_Result.winner_vote_count DESC");
                 $stmt->bind_param("d", $electionId);
                 $stmt->execute();
                 $stmt->bind_result($constituencyName, $candidateName, $partyName, $partySymbol, $voteCount, $candidateImg);
@@ -127,7 +127,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 $count=-1;
 
-                $stmt=$conn->prepare("SELECT Constituency_Result.constituency_name, Candidate.name, Candidate.party_name, Party.symbol, Constituency_Result.winner_vote_count, Candidate.img FROM Constituency_Result, Candidate, Party WHERE Constituency_Result.state_election_id=? AND Constituency_Result.winner_candidate_id=Candidate.id AND Party.name=Candidate.party_name");
+                $stmt=$conn->prepare("SELECT Constituency_Result.constituency_name, Candidate.name, Candidate.party_name, Party.symbol, Constituency_Result.winner_vote_count, Candidate.img FROM Constituency_Result, Candidate, Party WHERE Constituency_Result.state_election_id=? AND Constituency_Result.winner_candidate_id=Candidate.id AND Party.name=Candidate.party_name ORDER BY Constituency_Result.winner_vote_count DESC");
                 $stmt->bind_param("d", $stateElectionId);
                 $stmt->execute();
                 $stmt->bind_result($constituencyName, $candidateName, $partyName, $partySymbol, $voteCount, $candidateImg);
