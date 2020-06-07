@@ -29,6 +29,9 @@ $adminId=$conn->real_escape_string($_POST["adminId"]);
 
 
 $key_name="post_auth_key";
+$name=strtoupper($name);
+$constituencyName=strtoupper($constituencyName);
+$partyName=strtoupper($partyName);
 
 
 $response=array();
@@ -54,7 +57,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $response['validAuth']=true;
     
     
-        $stmt=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
+    $stmt=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
     $stmt->bind_param("s", $adminId);
     $stmt->execute();
     $stmt->bind_result($count);
@@ -111,8 +114,8 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $count=-1;
                     $response['validConstituency']=true;
 
-                    $stmt=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE state_code=? AND phase_code=? AND status=0");
-                    $stmt->bind_param("ss", $stateCode, $phaseCode);
+                    $stmt=$conn->prepare("SELECT id FROM Pub_Govt_Election WHERE state_election_id=? AND phase_code=? AND status=0");
+                    $stmt->bind_param("ds", $stateElectionId, $phaseCode);
                     $stmt->execute();
                     $stmt->bind_result($phaseElectionId);
                     $stmt->fetch();
@@ -130,12 +133,23 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                         $stmt->close();
                         $response['validCandidate']=true;
 
-                        $stmt=$conn->prepare("INSERT INTO Candidate (name, election_id, constituency_name, party_name, img) VALUES (?, ?, ?, ?, ?)");
-                        $stmt->bind_param("sdsss", $name, $phaseElectionId, $constituencyName, $partyName, $img);                
-
-                        if($stmt->execute())
+                        if(strlen($img)>0)
                         {
-                            $stmt->close();
+                            $stmt=$conn->prepare("INSERT INTO Candidate (name, election_id, constituency_name, party_name, img) VALUES (?, ?, ?, ?, ?)");
+                            $stmt->bind_param("sdsss", $name, $phaseElectionId, $constituencyName, $partyName, $img);                
+                        }
+                        else
+                        {                           
+                            $stmt=$conn->prepare("INSERT INTO Candidate (name, election_id, constituency_name, party_name) VALUES (?, ?, ?, ?)");
+                            $stmt->bind_param("sdss", $name, $phaseElectionId, $constituencyName, $partyName); 
+                        }       
+                        $stmt->execute();
+                        $countInserted=mysqli_affected_rows($conn);
+                        $stmt->fetch();
+                        $stmt->close();                 
+
+                        if($countInserted==1)
+                        {
 
                             $stmt=$conn->prepare("SELECT id FROM Candidate WHERE election_id=? AND party_name=? AND constituency_name=?");
                             $stmt->bind_param("dss", $phaseElectionId, $partyName, $constituencyName);
