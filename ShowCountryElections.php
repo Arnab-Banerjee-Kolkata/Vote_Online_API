@@ -54,7 +54,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $response['validAdmin']=true;
         $count=-1;
 
-        $stmt=$conn->prepare("SELECT Country_Election.id, Country_Election.name, Country_Election.year FROM Country_Election WHERE status=0");
+        $stmt=$conn->prepare("SELECT Country_Election.id, Country_Election.name, Country_Election.year FROM Country_Election WHERE status=0 ORDER BY Country_Election.year DESC");
         $stmt->execute();
         $stmt->bind_result($electionId, $electionName, $year);
 
