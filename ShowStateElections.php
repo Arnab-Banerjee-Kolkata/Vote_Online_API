@@ -79,12 +79,12 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $temp['year']=$year;
                 $temp['stateName']=$stateName;
                 array_push($election, $temp);
-                $response['success']=true;
             }
             $stmt->close();
 
 
             $response['elections']=$election;
+            $response['success']=true;
             
         }
         else if($type=="LOK SABHA")
@@ -120,12 +120,12 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $temp['year']=$year;
                     $temp['stateName']=$stateName;
                     array_push($election, $temp);
-                    $response['success']=true;
                 }
                 $stmt->close();
 
 
                 $response['elections']=$election;
+                $response['success']=true;
             }
         }
     }
