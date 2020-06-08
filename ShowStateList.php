@@ -42,7 +42,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stateList=array();
 
 
-    $stmt=$conn->prepare("SELECT name, code FROM State");
+    $stmt=$conn->prepare("SELECT name, code FROM State ORDER BY name");
     $stmt->execute();
     $stmt->bind_result($name, $code);
 
