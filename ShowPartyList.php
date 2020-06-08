@@ -57,7 +57,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $partyList=array();
 
 
-        $stmt=$conn->prepare("SELECT name, symbol FROM Party");
+        $stmt=$conn->prepare("SELECT name, symbol FROM Party ORDER BY name");
         $stmt->execute();
         $stmt->bind_result($name, $symbol);
 
