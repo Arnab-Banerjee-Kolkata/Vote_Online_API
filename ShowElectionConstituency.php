@@ -81,7 +81,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $pattern='VS%';
             }
 
-            $stmt=$conn->prepare("SELECT name FROM Constituency WHERE state_code=? AND phase_code LIKE ?");
+            $stmt=$conn->prepare("SELECT name FROM Constituency WHERE state_code=? AND phase_code LIKE ? ORDER BY name");
             $stmt->bind_param("ss",$stateCode, $pattern);
             $stmt->execute();
             $stmt->bind_result($name);
