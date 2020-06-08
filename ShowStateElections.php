@@ -63,7 +63,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         {
             $response['validType']=true;
             
-            $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.state_code, State_Election.year, State.name FROM State_Election, State WHERE State_Election.status=0 AND State_Election.type=? AND State.code=State_Election.state_code");
+            $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.state_code, State_Election.year, State.name FROM State_Election, State WHERE State_Election.status=0 AND State_Election.type=? AND State.code=State_Election.state_code ORDER BY State_Election.year DESC");
             $stmt->bind_param("s", $type);
             $stmt->execute();
             $stmt->bind_result($id, $name, $stateCode, $year, $stateName);
@@ -104,7 +104,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $response['validElection']=true;
                 $count=-1;
             
-                $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.state_code, State_Election.year, State.name FROM State_Election, State WHERE State_Election.country_election_id=? AND State_Election.status=0 AND State_Election.type=? AND State.code=State_Election.state_code");
+                $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.state_code, State_Election.year, State.name FROM State_Election, State WHERE State_Election.country_election_id=? AND State_Election.status=0 AND State_Election.type=? AND State.code=State_Election.state_code ORDER BY State.name");
                 $stmt->bind_param("ds", $countryElectionId, $type);
                 $stmt->execute();
                 $stmt->bind_result($id, $name, $stateCode, $year, $stateName);
