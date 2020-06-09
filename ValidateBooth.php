@@ -16,6 +16,7 @@ if($conn->connect_error){
 	die("Connection failed ");
 }
 
+date_default_timezone_set("Asia/Kolkata");
 
 $postAuthKey=$conn->real_escape_string($_POST["postAuthKey"]);
 $booth_id=$conn->real_escape_string($_POST["boothId"]);
@@ -61,14 +62,17 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
             $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
             
             if($otp==$otpsent && $smsCount<=4)
-            {
-                $response['success']=true;
+            {                
 				$smsCount=0;
-
-                $stmt3=$conn->prepare("UPDATE Booth SET status=1,sms_count=? WHERE booth_id=?");
-                $stmt3->bind_param("ds",$smsCount,$booth_id);
+    
+                $stmt3=$conn->prepare("UPDATE Booth SET status=1,sms_count=?,login_time=? WHERE booth_id=?");
+                $stmt3->bind_param("dss",$smsCount,date("Y-m-d H:i:s"),$booth_id);
                 $stmt3->execute();
+                $afftected=mysqli_affected_rows($conn);
                 $stmt3->close();
+
+                if($afftected==1)
+                    $response['success']=true;
             }
             elseif($otp!=$otpsent && $smsCount>=4)
             {
