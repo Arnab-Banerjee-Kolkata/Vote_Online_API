@@ -121,7 +121,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->fetch();
                 $stmt->close();
 
-
+                $response['stateElectionId']=$electionId;
                 $response['success']=true;
 
                 $response['results']=$results;
@@ -194,7 +194,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();           
 
                 $response['success']=true;
-
+                $response['stateElectionId']=$stateElectionId;
                 $response['results']=$results;
             }
 
@@ -262,7 +262,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 
 
                 $response['success']=true;
-
+                $response['stateElectionId']="";
                 $response['results']=$results;
 
             }
