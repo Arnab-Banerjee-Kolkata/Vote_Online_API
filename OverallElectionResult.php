@@ -52,6 +52,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $response['validType']=true;
         
         $count=-1;
+        $results=array();
 
 
         
@@ -85,8 +86,6 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->bind_param("d", $electionId);
                 $stmt->execute();
                 $stmt->bind_result($partyName, $seatsWon, $partySymbol, $alliance);
-
-                $results=array();
 
                 while($stmt->fetch())
                 {
@@ -153,9 +152,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt=$conn->prepare("SELECT State_Election_Result.party_name, State_Election_Result.seats_won, Party.symbol, Party.alliance FROM State_Election_Result, Party WHERE State_Election_Result.state_election_id=? AND State_Election_Result.country_election_id=? AND Party.name=State_Election_Result.party_name ORDER BY State_Election_Result.seats_won DESC");
                 $stmt->bind_param("dd", $stateElectionId, $electionId);
                 $stmt->execute();
-                $stmt->bind_result($partyName, $seatsWon, $partySymbol);
-
-                $results=array();
+                $stmt->bind_result($partyName, $seatsWon, $partySymbol, $alliance);
 
                 while($stmt->fetch())
                 {
@@ -222,9 +219,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt=$conn->prepare("SELECT Country_Election_Result.party_name, Country_Election_Result.seats_won, Party.symbol, Party.alliance FROM Country_Election_Result, Party WHERE Country_Election_Result.country_election_id=? AND Party.name=Country_Election_Result.party_name ORDER BY Country_Election_Result.seats_won DESC");
                 $stmt->bind_param("d", $electionId);
                 $stmt->execute();
-                $stmt->bind_result($partyName, $seatsWon, $partySymbol);
-
-                $results=array();
+                $stmt->bind_result($partyName, $seatsWon, $partySymbol, $alliance);
 
                 while($stmt->fetch())
                 {
@@ -272,6 +267,35 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 
             }
         }
+
+        $allianceList=array();
+
+        foreach($results as $result)
+        {
+            if(strlen($result['alliance'])!=0)      //HAS ALLIANCE
+            {
+                if(isset($allianceList[$result['alliance']]))
+                    $allianceList[$result['alliance']]+=$result['seatsWon'];
+                else
+                    $allianceList[$result['alliance']]=$result['seatsWon'];
+            }
+            else                //INDEPENDENT
+            {
+                if($result['seatsWon']>=$ALLIANCE_CUTOFF)
+                {
+                    $allianceList[$result['partyName']]=$result['seatsWon'];
+                }
+                else
+                {
+                    if(isset($allianceList['OTHERS']))
+                        $allianceList['OTHERS']+=$result['seatsWon'];
+                    else
+                        $allianceList['OTHERS']=$result['seatsWon'];
+                }
+            }
+        }
+
+        $response['allianceList']=$allianceList;
 
     }
 
