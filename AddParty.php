@@ -22,9 +22,12 @@ $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $name=$conn->real_escape_string($_POST["name"]);
 $symbol=$conn->real_escape_string($_POST["symbol"]);
 $adminId=$conn->real_escape_string($_POST["adminId"]);
+$alliance=$conn->real_escape_string($_POST["alliance"]);
 
 
 $key_name="post_auth_key";
+$name=strtoupper($name);
+$alliance=strtoupper($alliance);
 
 
 $response=array();
@@ -81,8 +84,8 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 $response['validSymbol']=true;
 
-                $stmt=$conn->prepare("INSERT INTO Party (name, symbol) VALUES (?, ?)");
-                $stmt->bind_param("ss", $name, $symbol);
+                $stmt=$conn->prepare("INSERT INTO Party (name, symbol, alliance) VALUES (?, ?,?)");
+                $stmt->bind_param("sss", $name, $symbol, $alliance);
                 $stmt->execute();
                 $stmt->fetch();
                 $stmt->close();
