@@ -32,7 +32,7 @@ function showPanelOptions($internalAuthKey, $conn, $boothId)
         
         //FETCH PANEL MEMBERS
         
-        $stmt=$conn->prepare("SELECT Candidate.id, Candidate.name, Candidate.party_name, Candidate.img, Party.symbol FROM Candidate, Party WHERE election_id=? AND constituency_name=? AND Party.name=Candidate.party_name");
+        $stmt=$conn->prepare("SELECT Candidate.id, Candidate.name, Candidate.party_name, Candidate.img, Party.symbol FROM Candidate, Party WHERE election_id=? AND constituency_name=? AND Party.name=Candidate.party_name ORDER BY Candidate.name");
         $stmt->bind_param("ds", $phaseElectionId, $constituencyName);
         $stmt->execute();
         $stmt->bind_result($canId, $canName, $canParty, $canImg, $symbol);
