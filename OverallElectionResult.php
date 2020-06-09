@@ -81,10 +81,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 $count=-1;
 
-                $stmt=$conn->prepare("SELECT State_Election_Result.party_name, State_Election_Result.seats_won, Party.symbol FROM State_Election_Result, Party WHERE state_election_id=? AND Party.name=State_Election_Result.party_name ORDER BY State_Election_Result.seats_won DESC");
+                $stmt=$conn->prepare("SELECT State_Election_Result.party_name, State_Election_Result.seats_won, Party.symbol, Party.alliance FROM State_Election_Result, Party WHERE state_election_id=? AND Party.name=State_Election_Result.party_name ORDER BY State_Election_Result.seats_won DESC");
                 $stmt->bind_param("d", $electionId);
                 $stmt->execute();
-                $stmt->bind_result($partyName, $seatsWon, $partySymbol);
+                $stmt->bind_result($partyName, $seatsWon, $partySymbol, $alliance);
 
                 $results=array();
 
@@ -94,6 +94,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $result['partyName']=$partyName;
                     $result['seatsWon']=$seatsWon;
                     $result['partySymbol']=$partySymbol;
+                    $result['alliance']=$alliance;
                     array_push($results, $result);
                 }
                 $stmt->close();
@@ -149,7 +150,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 $count=-1;
 
-                $stmt=$conn->prepare("SELECT State_Election_Result.party_name, State_Election_Result.seats_won, Party.symbol FROM State_Election_Result, Party WHERE State_Election_Result.state_election_id=? AND State_Election_Result.country_election_id=? AND Party.name=State_Election_Result.party_name ORDER BY State_Election_Result.seats_won DESC");
+                $stmt=$conn->prepare("SELECT State_Election_Result.party_name, State_Election_Result.seats_won, Party.symbol, Party.alliance FROM State_Election_Result, Party WHERE State_Election_Result.state_election_id=? AND State_Election_Result.country_election_id=? AND Party.name=State_Election_Result.party_name ORDER BY State_Election_Result.seats_won DESC");
                 $stmt->bind_param("dd", $stateElectionId, $electionId);
                 $stmt->execute();
                 $stmt->bind_result($partyName, $seatsWon, $partySymbol);
@@ -162,6 +163,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $result['partyName']=$partyName;
                     $result['seatsWon']=$seatsWon;
                     $result['partySymbol']=$partySymbol;
+                    $result['alliance']=$alliance;
                     array_push($results, $result);
                 }
                 $stmt->close();
@@ -217,7 +219,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt->close();
                 $count=-1;
 
-                $stmt=$conn->prepare("SELECT Country_Election_Result.party_name, Country_Election_Result.seats_won, Party.symbol FROM Country_Election_Result, Party WHERE Country_Election_Result.country_election_id=? AND Party.name=Country_Election_Result.party_name ORDER BY Country_Election_Result.seats_won DESC");
+                $stmt=$conn->prepare("SELECT Country_Election_Result.party_name, Country_Election_Result.seats_won, Party.symbol, Party.alliance FROM Country_Election_Result, Party WHERE Country_Election_Result.country_election_id=? AND Party.name=Country_Election_Result.party_name ORDER BY Country_Election_Result.seats_won DESC");
                 $stmt->bind_param("d", $electionId);
                 $stmt->execute();
                 $stmt->bind_result($partyName, $seatsWon, $partySymbol);
@@ -230,6 +232,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                     $result['partyName']=$partyName;
                     $result['seatsWon']=$seatsWon;
                     $result['partySymbol']=$partySymbol;
+                    $result['alliance']=$alliance;
                     array_push($results, $result);
                 }
                 $stmt->close();
