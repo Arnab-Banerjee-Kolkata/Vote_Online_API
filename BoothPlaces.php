@@ -35,15 +35,19 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 	$stmt->close();
 	$response['validAuth']=true;
 
-	$stmt2=$conn->prepare("SELECT DISTINCT place FROM Booth ORDER BY place");
+	$stmt2=$conn->prepare("SELECT DISTINCT Booth.place, State.name FROM Booth, State WHERE Booth.state_code=State.code ORDER BY place");
 	$stmt2->execute();
-	$stmt2->bind_result($place);
+	$stmt2->bind_result($place, $stateName);
 	
 	$allPlaces=array();
 	
 	while($stmt2->fetch())
 	{
-		array_push($allPlaces,$place);
+        $boothPlace=array();
+        $boothPlace['place']=$place;;
+        $boothPlace['state']=$stateName;
+
+		array_push($allPlaces,$boothPlace);
 	}
 
 	$stmt2->close();
