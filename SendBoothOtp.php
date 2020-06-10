@@ -70,7 +70,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 {
 	$stmt->close();
 	$response['validAuth']=true;
-    
+
     boothAutoLogout($INTERNAL_AUTH_KEY, $conn);
 
     $otp=generateOtp($INTERNAL_AUTH_KEY);
@@ -83,10 +83,10 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt2->close();
 
 	
-	$stmt2=$conn->prepare("SELECT COUNT(booth_id),phone_number,otp,sms_count FROM Booth WHERE booth_id=? AND status=0 AND sms_count<4");
+	$stmt2=$conn->prepare("SELECT COUNT(booth_id),phone_number,otp,sms_count,total_sms FROM Booth WHERE booth_id=? AND status=0 AND sms_count<4");
 	$stmt2->bind_param("s",$boothId);
 	$stmt2->execute();
-	$stmt2->bind_result($count,$regMobNo,$boothOTP,$smsCount);
+	$stmt2->bind_result($count,$regMobNo,$boothOTP,$smsCount,$totalSms);
 	
 	if($stmt2->fetch() && $count==1)
 	{
@@ -97,8 +97,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		
 		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$boothOTP,$API_KEY, $keySet[8]);
 		
-		$stmt4=$conn->prepare("UPDATE Booth SET sms_count=? WHERE booth_id=?");
-		$stmt4->bind_param("ds",++$smsCount,$boothId);
+		$stmt4=$conn->prepare("UPDATE Booth SET sms_count=?,total_sms=? WHERE booth_id=?");
+		$stmt4->bind_param("dds",++$smsCount,++$totalSms,$boothId);
 		$stmt4->execute();
 		$stmt4->fetch();
 		$stmt4->close();
