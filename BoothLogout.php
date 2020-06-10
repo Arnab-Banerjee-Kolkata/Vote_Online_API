@@ -57,7 +57,7 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
         $stmt->close();
 
         $otp=generateOtp($INTERNAL_AUTH_KEY);
-        $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
+        $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[$BOOTH_KEY]);
 
         $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
         $stmt2->bind_param("ss", $otp, $boothId);

@@ -42,7 +42,7 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 {
 	$stmt->close();
 	$response['validAuth']=true;
-    
+
     boothAutoLogout($INTERNAL_AUTH_KEY, $conn);
 	
 	$stmt2=$conn->prepare("SELECT COUNT(booth_id),status,otp,sms_count FROM Booth WHERE booth_id=?");
@@ -61,7 +61,7 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
         {
             $response['validLogin']=true;
 
-            $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
+            $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[$BOOTH_KEY]);
             
             if($otp==$otpsent && $smsCount<=4)
             {                
@@ -88,7 +88,7 @@ if($stmt->fetch() && $postAuthKey==$postAuthKey2)
 
             $otp=generateOtp($INTERNAL_AUTH_KEY);
 
-            $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
+            $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[$BOOTH_KEY]);
 
             $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
             $stmt2->bind_param("ss", $otp, $booth_id);

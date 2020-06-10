@@ -99,7 +99,7 @@ if($count==1)
             $stmt->close();
 
             $newOtp=generateOtp($INTERNAL_AUTH_KEY);
-            $newOtp=encrypt($INTERNAL_AUTH_KEY, $newOtp, $keySet[8]);
+            $newOtp=encrypt($INTERNAL_AUTH_KEY, $newOtp, $keySet[$VOTER_KEY]);
 
             $stmt7=$conn->prepare("UPDATE Credentials SET voter_otp=? WHERE aadhaar_no=?");
             $stmt7->bind_param("ss",$newOtp,$aadhaarNo);
@@ -130,7 +130,7 @@ if($count==1)
                     {
                         $stmt3->close();
                         $response['validSmsAuth']=true;
-                        
+
                         boothAutoLogout($INTERNAL_AUTH_KEY, $conn);
 
                         $phaseElectionId="";
@@ -201,7 +201,7 @@ if($count==1)
                                     $response['validLimit']=true;                                    
                                     $smsCount++;
 
-                                    if(sendOTP($conn, $INTERNAL_AUTH_KEY, $countryCode, $regMobNo, $voterOTP, $API_KEY, $keySet[8]))
+                                    if(sendOTP($conn, $INTERNAL_AUTH_KEY, $countryCode, $regMobNo, $voterOTP, $API_KEY, $keySet[$VOTER_KEY]))
                                     {
                                         if($count==0)
                                         {

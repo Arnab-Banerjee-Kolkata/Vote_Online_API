@@ -57,7 +57,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		$stmt4->close();
 
         $otp1=generateOtp($INTERNAL_AUTH_KEY);
-        $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[38]);
+        $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[$ADMIN_KEY]);
 		
 		$stmt3=$conn->prepare("UPDATE Admin_Credentials SET OTP=?,otpCount=0 WHERE id=?");
 		$stmt3->bind_param("ss",$otp1,$adminId);

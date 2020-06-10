@@ -46,7 +46,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 {
 	$stmt->close();
 	$response['validAuth']=true;
-    
+
     boothAutoLogout($INTERNAL_AUTH_KEY, $conn);
 	
 	$stmt2=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=? AND status=1");
@@ -113,7 +113,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
                 $stmt6->execute();
                 $stmt6->bind_result($otp);
 
-                $voterOtp=encrypt($INTERNAL_AUTH_KEY, $voterOtp, $keySet[8]);
+                $voterOtp=encrypt($INTERNAL_AUTH_KEY, $voterOtp, $keySet[$VOTER_KEY]);
                 
                 if($stmt6->fetch() && $voterOtp==$otp)
                 {
@@ -125,7 +125,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
                     if($response['returnValue']['garbageVoted']['success'])
                     {
                         $boothOtp=generateOtp($INTERNAL_AUTH_KEY);
-                        $enOtp=encrypt($INTERNAL_AUTH_KEY, $boothOtp, $keySet[8]);
+                        $enOtp=encrypt($INTERNAL_AUTH_KEY, $boothOtp, $keySet[$VOTER_KEY]);
 
                         $stmt=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=? AND status=1");
                         $stmt->bind_param("ss", $enOtp, $boothId);
@@ -142,7 +142,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
                 }
                 
                 $newOtp=generateOtp($INTERNAL_AUTH_KEY);
-                $newOtp=encrypt($INTERNAL_AUTH_KEY, $newOtp, $keySet[8]);
+                $newOtp=encrypt($INTERNAL_AUTH_KEY, $newOtp, $keySet[$VOTER_KEY]);
     
                 $stmt7=$conn->prepare("UPDATE Credentials SET voter_otp=? WHERE aadhaar_no=?");
                 $stmt7->bind_param("ss",$newOtp,$aadhaarNo);

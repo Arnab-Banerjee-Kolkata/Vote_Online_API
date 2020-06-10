@@ -73,7 +73,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
     adminAutoLogout($INTERNAL_AUTH_KEY, $conn);
 
     $otp1=generateOtp($INTERNAL_AUTH_KEY);
-    $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[38]);
+    $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[$ADMIN_KEY]);
     
     $stmt3=$conn->prepare("UPDATE Admin_Credentials SET OTP=?,otpCount=0 WHERE id=?");
     $stmt3->bind_param("ss",$otp1,$adminId);
@@ -93,7 +93,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		
 		$response['validAdmin']=true;
 		
-		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$adminOTP,$API_KEY, $keySet[38]);
+		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$adminOTP,$API_KEY, $keySet[$ADMIN_KEY]);
 		
 		$stmt4=$conn->prepare("UPDATE Admin_Credentials SET sms_count=?,total_sms=? WHERE id=?");
 		$stmt4->bind_param("dds",++$smsCount,++$totalSms,$adminId);

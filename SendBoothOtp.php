@@ -75,7 +75,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 
     $otp=generateOtp($INTERNAL_AUTH_KEY);
 
-    $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[8]);
+    $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[$BOOTH_KEY]);
 
     $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
     $stmt2->bind_param("ss", $otp, $boothId);
@@ -95,7 +95,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		
 		$response['validBooth']=true;
 		
-		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$boothOTP,$API_KEY, $keySet[8]);
+		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$boothOTP,$API_KEY, $keySet[$BOOTH_KEY]);
 		
 		$stmt4=$conn->prepare("UPDATE Booth SET sms_count=?,total_sms=? WHERE booth_id=?");
 		$stmt4->bind_param("dds",++$smsCount,++$totalSms,$boothId);
