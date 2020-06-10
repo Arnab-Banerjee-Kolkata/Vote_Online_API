@@ -18,6 +18,7 @@ if ($conn->connect_error) {
     die("Connection failed: ");
 }
 
+date_default_timezone_set("Asia/Kolkata");
 
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $adminId=$conn->real_escape_string($_POST["adminId"]);
@@ -61,8 +62,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$smsCount=0;
 			$otpCount=0;
 			
-			$stmt4=$conn->prepare("UPDATE Admin_Credentials SET status=1,sms_count=? WHERE id=?");
-			$stmt4->bind_param("ds",$smsCount,$adminId);
+			$stmt4=$conn->prepare("UPDATE Admin_Credentials SET status=1,sms_count=?,login_time=? WHERE id=?");
+			$stmt4->bind_param("dss",$smsCount,date("Y-m-d H:i:s"),$adminId);
 			$stmt4->execute();
 			$stmt4->close();
 			
