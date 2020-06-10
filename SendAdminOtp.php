@@ -69,7 +69,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 {
 	$stmt->close();
 	$response['validAuth']=true;
-    
+
     adminAutoLogout($INTERNAL_AUTH_KEY, $conn);
 
     $otp1=generateOtp($INTERNAL_AUTH_KEY);
@@ -81,10 +81,10 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt3->close();
 
 	
-	$stmt2=$conn->prepare("SELECT COUNT(id),phone_number,OTP,sms_count FROM Admin_Credentials WHERE id=? AND status=0 AND sms_count<4");
+	$stmt2=$conn->prepare("SELECT COUNT(id),phone_number,OTP,sms_count,total_sms FROM Admin_Credentials WHERE id=? AND status=0 AND sms_count<4");
 	$stmt2->bind_param("s",$adminId);
 	$stmt2->execute();
-	$stmt2->bind_result($count,$regMobNo,$adminOTP,$smsCount);
+	$stmt2->bind_result($count,$regMobNo,$adminOTP,$smsCount,$totalSms);
 	
 	if($stmt2->fetch() && $count==1)
 	{
@@ -95,8 +95,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		
 		$response['success']=sendOTP($conn,$INTERNAL_AUTH_KEY,91,$regMobNo,$adminOTP,$API_KEY, $keySet[38]);
 		
-		$stmt4=$conn->prepare("UPDATE Admin_Credentials SET sms_count=? WHERE id=?");
-		$stmt4->bind_param("ds",++$smsCount,$adminId);
+		$stmt4=$conn->prepare("UPDATE Admin_Credentials SET sms_count=?,total_sms=? WHERE id=?");
+		$stmt4->bind_param("dds",++$smsCount,++$totalSms,$adminId);
 		$stmt4->execute();
 		$stmt4->fetch();
 		$stmt4->close();
