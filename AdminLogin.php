@@ -41,6 +41,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 {
 	$stmt->close();
 	$response['validAuth']=true;
+    
+    adminAutoLogout($INTERNAL_AUTH_KEY, $conn);
 	
 	$stmt1=$conn->prepare("SELECT COUNT(id),OTP,sms_count,otpCount FROM Admin_Credentials WHERE id=? AND status=0");
 	$stmt1->bind_param("s",$adminId);

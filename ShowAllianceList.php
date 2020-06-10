@@ -42,6 +42,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt3->close();
     $response['validAuth']=true;
     
+    adminAutoLogout($INTERNAL_AUTH_KEY, $conn);    
     
     $stmt=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
     $stmt->bind_param("s", $adminId);

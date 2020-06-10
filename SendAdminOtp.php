@@ -69,6 +69,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 {
 	$stmt->close();
 	$response['validAuth']=true;
+    
+    adminAutoLogout($INTERNAL_AUTH_KEY, $conn);
 
     $otp1=generateOtp($INTERNAL_AUTH_KEY);
     $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[38]);
