@@ -70,7 +70,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 {
 	$stmt->close();
 	$response['validAuth']=true;
-
+    
+    boothAutoLogout($INTERNAL_AUTH_KEY, $conn);
 
     $otp=generateOtp($INTERNAL_AUTH_KEY);
 

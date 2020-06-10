@@ -130,6 +130,8 @@ if($count==1)
                     {
                         $stmt3->close();
                         $response['validSmsAuth']=true;
+                        
+                        boothAutoLogout($INTERNAL_AUTH_KEY, $conn);
 
                         $phaseElectionId="";
                         if($type=="LOK SABHA")

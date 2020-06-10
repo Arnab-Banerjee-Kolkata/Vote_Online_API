@@ -38,6 +38,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 {
 	$stmt->close();
 	$response['validAuth']=true;
+    
+    boothAutoLogout($INTERNAL_AUTH_KEY, $conn);
 	
 	$stmt2=$conn->prepare("SELECT COUNT(booth_id) FROM Booth WHERE booth_id=?");
 	$stmt2->bind_param("s",$boothId);
