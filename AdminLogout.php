@@ -37,13 +37,13 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 {
 	$stmt->close();
 	$response['validAuth']=true;
-    
+
     adminAutoLogout($INTERNAL_AUTH_KEY, $conn);
 	
-	$stmt1=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
+	$stmt1=$conn->prepare("SELECT COUNT(id),status FROM Admin_Credentials WHERE id=? AND (status=1 OR status=0)");
 	$stmt1->bind_param("s",$adminId);
 	$stmt1->execute();
-	$stmt1->bind_result($count1);
+	$stmt1->bind_result($count1,$oldStatus);
 	
 	if($stmt1->fetch() && $count1==1)
 	{
@@ -56,13 +56,16 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		$stmt4->execute();
 		$stmt4->close();
 
-        $otp1=generateOtp($INTERNAL_AUTH_KEY);
-        $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[$ADMIN_KEY]);
-		
-		$stmt3=$conn->prepare("UPDATE Admin_Credentials SET OTP=?,otpCount=0 WHERE id=?");
-		$stmt3->bind_param("ss",$otp1,$adminId);
-		$stmt3->execute();
-		$stmt3->close();
+        if($oldStatus==1)
+        {
+            $otp1=generateOtp($INTERNAL_AUTH_KEY);
+            $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[$ADMIN_KEY]);
+            
+            $stmt3=$conn->prepare("UPDATE Admin_Credentials SET OTP=?,otpCount=0 WHERE id=?");
+            $stmt3->bind_param("ss",$otp1,$adminId);
+            $stmt3->execute();
+            $stmt3->close();
+        }
 
 		$response['success']=true;
 	}
