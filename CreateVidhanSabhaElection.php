@@ -45,7 +45,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 {
     $stmt3->close();
     $response['validAuth']=true;
-    
+
     adminAutoLogout($INTERNAL_AUTH_KEY, $conn);
     
     $stmt=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
@@ -122,11 +122,9 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                         $stmt->bind_param("ssd", $stateCode, $phaseCode, $stateElectionId);
                         $stmt->execute();
                         $stmt->fetch();
-                        $stmt->close();
-
-                        $response['success']=true;
+                        $stmt->close();                        
                     }
-                    
+                    $response['success']=true;
                 }
             }
 
