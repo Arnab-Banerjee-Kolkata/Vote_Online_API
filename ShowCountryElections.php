@@ -41,7 +41,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 {
     $stmt3->close();
     $response['validAuth']=true;
-    
+
     adminAutoLogout($INTERNAL_AUTH_KEY, $conn);
 
     $stmt=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
@@ -69,12 +69,12 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $temp['name']=$electionName;
             $temp['year']=$year;
             array_push($election, $temp);
-            $response['success']=true;
         }
         $stmt->close();
         
         
         $response['elections']=$election;
+        $response['success']=true;
     }
 
 }
