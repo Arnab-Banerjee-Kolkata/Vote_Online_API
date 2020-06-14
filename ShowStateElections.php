@@ -20,6 +20,7 @@ $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $type=$conn->real_escape_string($_POST["type"]);
 $countryElectionId=$conn->real_escape_string($_POST["countryElectionId"]);
 $adminId=$conn->real_escape_string($_POST["adminId"]);
+$isChangeStatus=$conn->real_escape_string($_POST["isChangeStatus"]);
 
 
 
@@ -45,7 +46,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 {
     $stmt3->close();
     $response['validAuth']=true;
-    
+
     adminAutoLogout($INTERNAL_AUTH_KEY, $conn);    
 
     $stmt=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
@@ -60,56 +61,60 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $response['validAdmin']=true;
         $count=-1;
     
-        if($type=="VIDHAN SABHA")
-        {
-            $response['validType']=true;
-            
-            $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.state_code, State_Election.year, State.name FROM State_Election, State WHERE State_Election.status=0 AND State_Election.type=? AND State.code=State_Election.state_code ORDER BY State_Election.year DESC");
-            $stmt->bind_param("s", $type);
-            $stmt->execute();
-            $stmt->bind_result($id, $name, $stateCode, $year, $stateName);
-            
-            $election=array();
-
-            while($stmt->fetch())
-            {
-                $temp=array();
-                $temp['electionId']=$id;
-                $temp['name']=$name;
-                $temp['stateCode']=$stateCode;
-                $temp['year']=$year;
-                $temp['stateName']=$stateName;
-                array_push($election, $temp);
-            }
-            $stmt->close();
-
-
-            $response['elections']=$election;
-            $response['success']=true;
-            
-        }
-        else if($type=="LOK SABHA")
+        if(($isChangeStatus=="true" || $isChangeStatus=="TRUE)" && $type=="LOK SABHA")
         {
             $response['validType']=true;
             $count=-1;
-            
-            $stmt=$conn->prepare("SELECT COUNT(id) FROM Country_Election WHERE id=? AND status=0");
-            $stmt->bind_param("d", $countryElectionId);
+
+            $stmt=$conn->prepare("SELECT COUNT(id) FROM Country_Election WHERE id=?");
+            $stmt->bind_param("d", $electionId);
             $stmt->execute();
             $stmt->bind_result($count);
             $stmt->fetch();
             $stmt->close();
-            
+
             if($count==1)
             {
                 $response['validElection']=true;
                 $count=-1;
-            
-                $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.state_code, State_Election.year, State.name FROM State_Election, State WHERE State_Election.country_election_id=? AND State_Election.status=0 AND State_Election.type=? AND State.code=State_Election.state_code ORDER BY State.name");
-                $stmt->bind_param("ds", $countryElectionId, $type);
+
+                $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.state_code, State_Election.year, State.name FROM State_Election, State WHERE State_Election.country_election_id=? AND State_Election.type=? AND State.code=State_Election.state_code ORDER BY State.name");
+                    $stmt->bind_param("ds", $countryElectionId, $type);
+                    $stmt->execute();
+                    $stmt->bind_result($id, $name, $stateCode, $year, $stateName);
+
+                    $election=array();
+
+                    while($stmt->fetch())
+                    {
+                        $temp=array();
+                        $temp['electionId']=$id;
+                        $temp['name']=$name;
+                        $temp['stateCode']=$stateCode;
+                        $temp['year']=$year;
+                        $temp['stateName']=$stateName;
+                        array_push($election, $temp);
+                    }
+                    $stmt->close();
+
+
+                    $response['elections']=$election;
+                    $response['success']=true;
+
+            }
+
+        }
+        else
+        {
+            if($type=="VIDHAN SABHA")
+            {
+                $response['validType']=true;
+                
+                $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.state_code, State_Election.year, State.name FROM State_Election, State WHERE State_Election.status=0 AND State_Election.type=? AND State.code=State_Election.state_code ORDER BY State_Election.year DESC");
+                $stmt->bind_param("s", $type);
                 $stmt->execute();
                 $stmt->bind_result($id, $name, $stateCode, $year, $stateName);
-
+                
                 $election=array();
 
                 while($stmt->fetch())
@@ -127,6 +132,48 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 
                 $response['elections']=$election;
                 $response['success']=true;
+                
+            }
+            else if($type=="LOK SABHA")
+            {
+                $response['validType']=true;
+                $count=-1;
+                
+                $stmt=$conn->prepare("SELECT COUNT(id) FROM Country_Election WHERE id=? AND status=0");
+                $stmt->bind_param("d", $countryElectionId);
+                $stmt->execute();
+                $stmt->bind_result($count);
+                $stmt->fetch();
+                $stmt->close();
+                
+                if($count==1)
+                {
+                    $response['validElection']=true;
+                    $count=-1;
+                
+                    $stmt=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.state_code, State_Election.year, State.name FROM State_Election, State WHERE State_Election.country_election_id=? AND State_Election.status=0 AND State_Election.type=? AND State.code=State_Election.state_code ORDER BY State.name");
+                    $stmt->bind_param("ds", $countryElectionId, $type);
+                    $stmt->execute();
+                    $stmt->bind_result($id, $name, $stateCode, $year, $stateName);
+
+                    $election=array();
+
+                    while($stmt->fetch())
+                    {
+                        $temp=array();
+                        $temp['electionId']=$id;
+                        $temp['name']=$name;
+                        $temp['stateCode']=$stateCode;
+                        $temp['year']=$year;
+                        $temp['stateName']=$stateName;
+                        array_push($election, $temp);
+                    }
+                    $stmt->close();
+
+
+                    $response['elections']=$election;
+                    $response['success']=true;
+                }
             }
         }
     }
