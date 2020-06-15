@@ -61,13 +61,13 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $response['validAdmin']=true;
         $count=-1;
     
-        if(($isChangeStatus=="true" || $isChangeStatus=="TRUE)" && $type=="LOK SABHA")
+        if(($isChangeStatus=="true" || $isChangeStatus=="TRUE") && $type=="LOK SABHA")
         {
             $response['validType']=true;
             $count=-1;
 
             $stmt=$conn->prepare("SELECT COUNT(id) FROM Country_Election WHERE id=?");
-            $stmt->bind_param("d", $electionId);
+            $stmt->bind_param("d", $countryElectionId);
             $stmt->execute();
             $stmt->bind_result($count);
             $stmt->fetch();
