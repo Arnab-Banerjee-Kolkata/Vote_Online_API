@@ -19,19 +19,21 @@ if ($conn->connect_error) {
 
 
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
-$stateCode=$conn->real_escape_string($_POST["stateCode"]);
+$stateElectionId=$conn->real_escape_string($_POST["stateElectionId"]);
 $type=$conn->real_escape_string($_POST["type"]);
 $adminId=$conn->real_escape_string($_POST["adminId"]);
 
 
 $key_name="post_auth_key";
+$type=strtoupper($type);
 
 
 $response=array();
 $response['success']=false;
 $response['validAuth']=false;
 $response['validAdmin']=false;
-$response['validCombination']=false;
+$response['validType']=false;
+$response['validElection']=false;
 
 $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name =?");
 $stmt3->bind_param("s", $key_name);
@@ -44,7 +46,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 {
     $stmt3->close();
     $response['validAuth']=true;
-    
+
     adminAutoLogout($INTERNAL_AUTH_KEY, $conn);
 
     $stmt=$conn->prepare("SELECT COUNT(id) FROM Admin_Credentials WHERE id=? AND status=1");
@@ -59,39 +61,46 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $response['validAdmin']=true;
         $count=-1;
 
-        $phase=array();
-
-
-        $stmt=$conn->prepare("SELECT COUNT(code) FROM Phase WHERE state_code=? AND type=?");
-        $stmt->bind_param("ss", $stateCode, $type);
-        $stmt->execute();
-        $stmt->bind_result($count);
-
-        if($stmt->fetch() && $count>=1)
+        if($type=="LOK SABHA" || $type=="VIDHAN SABHA")
         {
-            $response['validCombination']=true;
-            $stmt->close();
+            $response['validType']=true;
+            $count=-1;
 
-            $stmt=$conn->prepare("SELECT type, code FROM Phase WHERE state_code=? AND type=?");
-            $stmt->bind_param("ss", $stateCode, $type);
+            $stmt=$conn->prepare("SELECT COUNT(id) FROM State_Election WHERE id=? AND type=?");
+            $stmt->bind_param("ds", $stateElectionId, $type);
             $stmt->execute();
-            $stmt->bind_result($type, $code);
-
-            while($stmt->fetch())
-            {
-                $temp=array();
-                $temp['type']=$type;
-                $temp['code']=$code;
-
-                array_push($phase, $temp);
-            }
+            $stmt->bind_result($count);
+            $stmt->fetch();
             $stmt->close();
 
-            $response['phases']=$phase;
+            if($count==1)
+            {
+                $response['validElection']=true;
 
-            $response['success']=true;
+                $phaseElections=array();
+
+                $stmt=$conn->prepare("SELECT phase_code, status FROM Pub_Govt_Election WHERE state_election_id=?");
+                $stmt->bind_param("d", $stateElectionId);
+                $stmt->execute();
+                $stmt->bind_result($phaseCode, $status);
+                
+                while($stmt->fetch())
+                {
+                    $phaseElection=array();
+                    $phaseElection['phaseCode']=$phaseCode;
+                    $phaseElection['status']=$status;
+
+                    array_push($phaseElections, $phaseElection);
+                }
+
+                $stmt->close();
+
+                $response['phaseElections']=$phaseElections;
+                $response['success']=true;
+            }
 
         }
+
     }
     
 
