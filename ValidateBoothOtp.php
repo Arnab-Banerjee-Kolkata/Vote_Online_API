@@ -61,7 +61,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $response['validBooth']=true; 
                    
         
-        $stmt = $conn->prepare("SELECT otp FROM Booth WHERE booth_id=? AND status=1");
+        $stmt = $conn->prepare("SELECT vote_code FROM Booth WHERE booth_id=?");
         $stmt->bind_param("s", $boothId);
         $stmt->execute();
         $stmt->bind_result($otp2);
@@ -74,11 +74,11 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             $response['validOtp']=true; 
 
 
-            $otp=generateOtp($INTERNAL_AUTH_KEY);
-            $otp=encrypt($INTERNAL_AUTH_KEY, $otp, $keySet[$BOOTH_KEY]);
+            $voteCode=generateOtp($INTERNAL_AUTH_KEY);
+            $voteCode=encrypt($INTERNAL_AUTH_KEY, $voteCode, $keySet[$BOOTH_KEY]);
 
-            $stmt2=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=?");
-            $stmt2->bind_param("ss", $otp, $boothId);
+            $stmt2=$conn->prepare("UPDATE Booth SET vote_code=? WHERE booth_id=?");
+            $stmt2->bind_param("ss", $voteCode, $boothId);
             $stmt2->execute();
 
             $stmt2->close();
