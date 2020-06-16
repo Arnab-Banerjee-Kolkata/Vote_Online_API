@@ -31,6 +31,7 @@ $key_name="post_auth_key";
 $response=array();
 $response['validAuth']=false;
 $response['validBooth']=false;
+$response['validApproval']=false;
 $response['validOtp']=false;
 
 
@@ -59,72 +60,85 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $count=-1;
         $stmt->close();
         $response['validBooth']=true; 
-                   
-        
-        $stmt = $conn->prepare("SELECT vote_code FROM Booth WHERE booth_id=?");
-        $stmt->bind_param("s", $boothId);
-        $stmt->execute();
-        $stmt->bind_result($otp2);
-
-        $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[$BOOTH_KEY]);
-
-        if($stmt->fetch() && $otp1==$otp2)
-        {                     
-            $stmt->close();
-            $response['validOtp']=true; 
 
 
-            $voteCode=generateOtp($INTERNAL_AUTH_KEY);
-            $voteCode=encrypt($INTERNAL_AUTH_KEY, $voteCode, $keySet[$BOOTH_KEY]);
+        //REMOVES EXPIRED APPROVAL
+        $stmt5=$conn->prepare("SELECT COUNT(booth_id), approved_at FROM Govt_Approval WHERE booth_id=?");
+        $stmt5->bind_param("s",$boothId);
+        $stmt5->execute();
+        $stmt5->bind_result($count4, $approvedAt);
+        $stmt5->fetch();
+        $stmt5->close();
 
-            $stmt2=$conn->prepare("UPDATE Booth SET vote_code=? WHERE booth_id=?");
-            $stmt2->bind_param("ss", $voteCode, $boothId);
-            $stmt2->execute();
-
-            $stmt2->close();
-
-
-            //REMOVES EXPIRED APPROVAL
-            $stmt5=$conn->prepare("SELECT COUNT(booth_id), approved_at FROM Govt_Approval WHERE booth_id=?");
-            $stmt5->bind_param("s",$boothId);
-            $stmt5->execute();
-            $stmt5->bind_result($count4, $approvedAt);
-            $stmt5->fetch();
-            $stmt5->close();
-
-            if($count4==1)
-            {
-                $approvedAt=new DateTime($approvedAt);
-                $currentTime=new DateTime(date("Y-m-d H:i:s"));
-                $minsPassed=$approvedAt->diff($currentTime);
-
-                $minutes = $minsPassed->days * 24 * 60;
-                $minutes += $minsPassed->h * 60;
-                $minutes += $minsPassed->i;
-
-                //echo $minutes."   ".$APPROVAL_MINUTES."<br>";
-                if($minutes>=$APPROVAL_MINUTES)
-                {
-                    $stmt=$conn->prepare("DELETE FROM Govt_Approval WHERE booth_id=?");
-                    $stmt->bind_param("s", $boothId);
-                    $stmt->execute();
-                    $stmt->fetch();
-                    $stmt->close();
-
-                    $count4=0;
-                }
-            }
-
-
-            //SHOW APPROPRIATE VOTING PANEL
-            $response['sub']=showPanelOptions($INTERNAL_AUTH_KEY, $conn, $boothId);
-
-
-        }    
-        else
+        if($count4==1)
         {
-            $stmt->close();
-        }                
+            $approvedAt=new DateTime($approvedAt);
+            $currentTime=new DateTime(date("Y-m-d H:i:s"));
+            $minsPassed=$approvedAt->diff($currentTime);
+
+            $minutes = $minsPassed->days * 24 * 60;
+            $minutes += $minsPassed->h * 60;
+            $minutes += $minsPassed->i;
+
+            //echo $minutes."   ".$APPROVAL_MINUTES."<br>";
+            if($minutes>=$APPROVAL_MINUTES)
+            {
+                $stmt=$conn->prepare("DELETE FROM Govt_Approval WHERE booth_id=?");
+                $stmt->bind_param("s", $boothId);
+                $stmt->execute();
+                $stmt->fetch();
+                $stmt->close();
+
+                $count4=0;
+            }
+        }
+
+        $stmt5=$conn->prepare("SELECT COUNT(booth_id) FROM Govt_Approval WHERE booth_id=?");
+        $stmt5->bind_param("s",$boothId);
+        $stmt5->execute();
+        $stmt5->bind_result($count);
+        $stmt5->fetch();
+        $stmt5->close();
+
+        if($count==1)
+        {
+            $response['validApproval']=true;
+            $count=-1;
+        
+            $stmt = $conn->prepare("SELECT vote_code FROM Booth WHERE booth_id=?");
+            $stmt->bind_param("s", $boothId);
+            $stmt->execute();
+            $stmt->bind_result($otp2);
+
+            $otp1=encrypt($INTERNAL_AUTH_KEY, $otp1, $keySet[$BOOTH_KEY]);
+
+            if($stmt->fetch() && $otp1==$otp2)
+            {                     
+                $stmt->close();
+                $response['validOtp']=true; 
+
+
+                $voteCode=generateOtp($INTERNAL_AUTH_KEY);
+                $voteCode=encrypt($INTERNAL_AUTH_KEY, $voteCode, $keySet[$BOOTH_KEY]);
+
+                $stmt2=$conn->prepare("UPDATE Booth SET vote_code=? WHERE booth_id=?");
+                $stmt2->bind_param("ss", $voteCode, $boothId);
+                $stmt2->execute();
+
+                $stmt2->close();
+
+
+                //SHOW APPROPRIATE VOTING PANEL
+                $response['sub']=showPanelOptions($INTERNAL_AUTH_KEY, $conn, $boothId);
+
+        
+
+            }    
+            else
+            {
+                $stmt->close();
+            }                
+        }
         
     }
         
