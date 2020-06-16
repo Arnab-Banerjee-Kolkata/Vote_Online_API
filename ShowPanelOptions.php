@@ -53,6 +53,8 @@ function showPanelOptions($internalAuthKey, $conn, $boothId)
         $stmt->close();
         
         $response['candidates']=$candidates;
+        $response['phaseElectionId']=$phaseElectionId;
+        $response['constituencyName']=$constituencyName;
 
 
         $stmt=$conn->prepare("DELETE FROM Govt_Approval WHERE booth_id=? AND contituency_name=? AND election_id=?");
