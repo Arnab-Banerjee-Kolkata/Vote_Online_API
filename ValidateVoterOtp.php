@@ -124,16 +124,16 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
                     $response['returnValue']=storeApproval($conn,$INTERNAL_AUTH_KEY,$aadhaarNo,$electionId,$type,$boothId);
                     if($response['returnValue']['garbageVoted']['success'])
                     {
-                        $boothOtp=generateOtp($INTERNAL_AUTH_KEY);
-                        $enOtp=encrypt($INTERNAL_AUTH_KEY, $boothOtp, $keySet[$VOTER_KEY]);
+                        $voteCode=generateOtp($INTERNAL_AUTH_KEY);
+                        $enCode=encrypt($INTERNAL_AUTH_KEY, $voteCode, $keySet[$VOTER_KEY]);
 
-                        $stmt=$conn->prepare("UPDATE Booth SET otp=? WHERE booth_id=? AND status=1");
-                        $stmt->bind_param("ss", $enOtp, $boothId);
+                        $stmt=$conn->prepare("UPDATE Booth SET vote_code=? WHERE booth_id=?");
+                        $stmt->bind_param("ss", $enCode, $boothId);
                         $stmt->execute();
                         $stmt->fetch();
                         $stmt->close();  
 
-                        $response['boothOtp']=$boothOtp;
+                        $response['boothOtp']=$voteCode;
                     }
                 }
                 else
