@@ -27,6 +27,7 @@ if($vbConn->connect_error){
 $postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
 $boothId=$conn->real_escape_string($_POST["boothId"]);
 $enVote=$vbConn->real_escape_string($_POST["enVote"]);
+$voteCode=$conn->real_escape_string($_POST["voteCode"]);
 
 
 $key_name="post_auth_key";
@@ -131,9 +132,11 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 }
             }   
 
+            $enCode=encrypt($INTERNAL_AUTH_KEY, $voteCode, $keySet[$VOTER_KEY]);
+            $count=-1;
 
-            $stmt=$conn->prepare("SELECT COUNT(booth_id) FROM Govt_Approval WHERE booth_id=? AND election_id=? AND constituency_name=?");
-            $stmt->bind_param("sds", $boothId, $phaseElectionId, $constituencyName);
+            $stmt=$conn->prepare("SELECT COUNT(booth_id) FROM Govt_Approval WHERE booth_id=? AND election_id=? AND constituency_name=? AND panel_count=1 AND vote_code=?");
+            $stmt->bind_param("sdss", $boothId, $phaseElectionId, $constituencyName, $enCode);
             $stmt->execute();
             $stmt->bind_result($count);
             $stmt->fetch();
