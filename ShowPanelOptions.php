@@ -53,15 +53,7 @@ function showPanelOptions($internalAuthKey, $conn, $boothId)
         $stmt->close();
         
         $response['candidates']=$candidates;
-        $response['phaseElectionId']=$phaseElectionId;
-        $response['constituencyName']=$constituencyName;
 
-
-        $stmt=$conn->prepare("DELETE FROM Govt_Approval WHERE booth_id=? AND contituency_name=? AND election_id=?");
-        $stmt->bind_param("sss", $boothId, $constituencyName, $phaseElectionId);
-        $stmt->execute();
-        $stmt->fetch();
-        $stmt->close();
 
         $stmt=$conn->prepare("SELECT vote_code FROM Booth WHERE booth_id=?");
         $stmt->bind_param("s", $boothId);
