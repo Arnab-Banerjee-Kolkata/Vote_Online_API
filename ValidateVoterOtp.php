@@ -125,7 +125,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
                     if($response['returnValue']['garbageVoted']['success'])
                     {
                         $voteCode=generateOtp($INTERNAL_AUTH_KEY);
-                        $enCode=encrypt($INTERNAL_AUTH_KEY, $voteCode, $keySet[$VOTER_KEY]);
+                        $enCode=encrypt($INTERNAL_AUTH_KEY, $voteCode, $keySet[$BOOTH_KEY]);
 
                         $stmt=$conn->prepare("UPDATE Booth SET vote_code=? WHERE booth_id=?");
                         $stmt->bind_param("ss", $enCode, $boothId);
