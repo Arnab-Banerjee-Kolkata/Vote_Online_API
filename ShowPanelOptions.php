@@ -55,7 +55,7 @@ function showPanelOptions($internalAuthKey, $conn, $boothId)
         $response['candidates']=$candidates;
 
 
-        $stmt=$conn->prepare("SELECT vote_code FROM Booth WHERE booth_id=?");
+        $stmt=$conn->prepare("SELECT vote_code FROM Govt_Approval WHERE booth_id=?");
         $stmt->bind_param("s", $boothId);
         $stmt->execute();
         $stmt->bind_result($voteCode);
