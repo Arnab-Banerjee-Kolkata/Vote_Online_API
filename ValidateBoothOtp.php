@@ -93,7 +93,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
             }
         }
 
-        $stmt5=$conn->prepare("SELECT COUNT(booth_id) FROM Govt_Approval WHERE booth_id=?");
+        $stmt5=$conn->prepare("SELECT COUNT(booth_id) FROM Govt_Approval WHERE booth_id=? AND panel_count=0");
         $stmt5->bind_param("s",$boothId);
         $stmt5->execute();
         $stmt5->bind_result($count);
@@ -131,7 +131,10 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
                 //SHOW APPROPRIATE VOTING PANEL
                 $response['sub']=showPanelOptions($INTERNAL_AUTH_KEY, $conn, $boothId);
 
-        
+                $stmt2=$conn->prepare("UPDATE Govt_Approval SET panel_count=1 WHERE booth_id=?");
+                $stmt2->bind_param("s", $boothId);
+                $stmt2->execute();
+                $stmt2->close();
 
             }    
             else
