@@ -63,7 +63,7 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
                 $voteCode=generateOtp($INTERNAL_AUTH_KEY);
                 $enCode=encrypt($INTERNAL_AUTH_KEY, $voteCode, $keySet[$VOTER_KEY]);
 
-                $stmt4=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name,approved_at,vote_code) VALUES (?,?,?,?,?)");
+                $stmt4=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name,approved_at,vote_code,panel_count) VALUES (?,?,?,?,?,0)");
                 $stmt4->bind_param("dssss",$phaseId,$boothId,$vsConst,date("Y-m-d H:i:s"),$enCode);
                 $stmt4->execute();
                 $stmt4->close();
@@ -113,7 +113,7 @@ function storeApproval($conn,$internalAuthKey,$aadhaarNo,$electionId,$type,$boot
                 $voteCode=generateOtp($INTERNAL_AUTH_KEY);
                 $enCode=encrypt($INTERNAL_AUTH_KEY, $voteCode, $keySet[$VOTER_KEY]);
 			
-                $stmt9=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name,approved_at,vote_code) VALUES (?,?,?,?,?)");
+                $stmt9=$conn->prepare("INSERT INTO Govt_Approval (election_id,booth_id,constituency_name,approved_at,vote_code,panel_count) VALUES (?,?,?,?,?,0)");
                 $stmt9->bind_param("dssss",$phaseId,$boothId,$lsConst,date("Y-m-d H:i:s"),$enCode);
                 $stmt9->execute();
                 $stmt9->fetch();
