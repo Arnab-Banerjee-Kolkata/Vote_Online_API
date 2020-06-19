@@ -22,10 +22,10 @@ if ($conn->connect_error) {
 
 $boothId=$conn->real_escape_string($_POST["boothId"]);
 $otp1=$conn->real_escape_string($_POST["otp"]);
-$postAuthKey1=$conn->real_escape_string($_POST["postAuthKey"]);
+$voteAuthKey1=$conn->real_escape_string($_POST["voteAuthKey"]);
 
 
-$key_name="post_auth_key";
+$key_name="vote_auth_key";
 
 
 $response=array();
@@ -39,12 +39,12 @@ $stmt3=$conn->prepare("SELECT key_value FROM Authenticate_Keys WHERE name = ?");
 $stmt3->bind_param("s", $key_name);
 
 $stmt3->execute();
-$stmt3->bind_result($postAuthKey2);
+$stmt3->bind_result($voteAuthKey2);
 
 
 
 
-if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
+if($stmt3->fetch() && $voteAuthKey1==$voteAuthKey2)
 {
     $stmt3->close();
     $response['validAuth']=true;
