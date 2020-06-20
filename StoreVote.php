@@ -3,6 +3,7 @@
 
 include 'Credentials.php';
 include 'Protection.php';
+include 'EncryptionKeys.php';
 
 foreach($_POST as $element)
 {
