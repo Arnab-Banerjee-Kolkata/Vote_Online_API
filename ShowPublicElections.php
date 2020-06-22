@@ -76,6 +76,11 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 	}
 	$stmt2->close();
 	
+    $year = array_column($election, 'year');
+
+    array_multisort($year, SORT_DESC, $election);
+
+
     $response['elections']=$election;
 
 }
