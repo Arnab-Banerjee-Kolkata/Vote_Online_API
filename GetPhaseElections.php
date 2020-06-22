@@ -79,16 +79,17 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
 
                 $phaseElections=array();
 
-                $stmt=$conn->prepare("SELECT phase_code, status FROM Pub_Govt_Election WHERE state_election_id=?");
+                $stmt=$conn->prepare("SELECT phase_code, status, id FROM Pub_Govt_Election WHERE state_election_id=?");
                 $stmt->bind_param("d", $stateElectionId);
                 $stmt->execute();
-                $stmt->bind_result($phaseCode, $status);
+                $stmt->bind_result($phaseCode, $status, $electionId);
                 
                 while($stmt->fetch())
                 {
                     $phaseElection=array();
                     $phaseElection['phaseCode']=$phaseCode;
                     $phaseElection['status']=$status;
+                    $phaseElection['id']=$electionId;
 
                     array_push($phaseElections, $phaseElection);
                 }
