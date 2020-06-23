@@ -71,7 +71,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $temp2['type']=$type;
         $temp2['status']=$status;
         $temp2['year']=$year;
-        $temp2['stateCode']=$stateName;
+        $temp2['stateName']=$stateName;
         array_push($election, $temp2);
         $response['success']=true;
 	}
