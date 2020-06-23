@@ -59,9 +59,9 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt->close();
 	
 	
-	$stmt2=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.type, State_Election.status, State_Election.year FROM State_Election WHERE State_Election.type='VIDHAN SABHA'");
+	$stmt2=$conn->prepare("SELECT State_Election.id, State_Election.name, State_Election.type, State_Election.status, State_Election.year, State.name FROM State_Election, State WHERE State_Election.type='VIDHAN SABHA' AND State_Election.state_code=State.code");
 	$stmt2->execute();
-	$stmt2->bind_result($electionId, $electionName, $type, $status, $year);
+	$stmt2->bind_result($electionId, $electionName, $type, $status, $year, $stateName);
 	
 	while($stmt2->fetch())
     {
@@ -71,6 +71,7 @@ if($stmt3->fetch() && $postAuthKey1==$postAuthKey2)
         $temp2['type']=$type;
         $temp2['status']=$status;
         $temp2['year']=$year;
+        $temp2['stateCode']=$stateName;
         array_push($election, $temp2);
         $response['success']=true;
 	}
