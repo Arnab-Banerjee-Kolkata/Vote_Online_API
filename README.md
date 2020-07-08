@@ -108,7 +108,7 @@ Clone this to your machine repo with the help of steps from here: https://www.co
 <br>
 33. Total sms count for admin and booth: Helps to observe misuse of sms credits
 <br>
-34. Unique token to be sent with panel which will be required to cast vote: Attacker cannot cast a vote from other device in the small time window allotted for voting
+34. Random token to be sent with panel which will be required to cast vote: Attacker cannot cast a vote from other device in the small time window allotted for voting
 <br>
 <br>
 <br>
