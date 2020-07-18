@@ -139,7 +139,7 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
         $stmt->fetch();
         $stmt->close();
             
-        if($seatsWon==null || $seatsWon=='')    //State does not have party
+        if($seatsWon==null || $seatsWon=='' || $seatsWon<=0)    //State does not have party
         {
             if($type=="VIDHAN SABHA")     //Only state
             {
@@ -170,16 +170,19 @@ function storeResult($internalAuthKey, $conn, $countryElectionId, $stateElection
                 $stmt->fetch();
                 $stmt->close();
                 
-                if($seatsWon==null || $seatsWon=='')    //Country does not have party
+                if($seatsWon==null || $seatsWon=='' || $seatsWon<=0)    //Country does not have party
                 {
                     $stmt=$conn->prepare("INSERT INTO Country_Election_Result (country_election_id, party_name, seats_won) VALUES (?, ?, 1)");
                     $stmt->bind_param("ds", $countryElectionId, $partyName);
                     $stmt->execute();
                     $stmt->fetch();
                     $stmt->close();
+
+                    echo ("here1");
                 }
                 else        //Country has party
                 {
+                    echo ("here2 ".$seatsWon);
                     $seatsWon++;
                     $stmt=$conn->prepare("UPDATE Country_Election_Result SET seats_won=? WHERE party_name=? AND country_election_id=?");
                     $stmt->bind_param("dsd", $seatsWon , $partyName, $countryElectionId);
