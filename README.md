@@ -1,7 +1,3 @@
-# Demonstration Video
-
-https://drive.google.com/file/d/1-8MAnlsEy63o3watSNZj3OkcaUjzvpmV/view?usp=sharing
-
 # Vote_Online_API
 
 <b>Election status::</b><br><br>
@@ -46,10 +42,11 @@ Clone this to your machine repo with the help of steps from here: https://www.co
       git submodule foreach git pull origin master<br>
       git commit -am "Your Name | commit message"<br>
       git push origin master<br>
-<br>
-<br>
-<br>
-<b>SECURITY MEASURES</b><br><br>
+
+# Demonstration Video
+
+https://drive.google.com/file/d/1-8MAnlsEy63o3watSNZj3OkcaUjzvpmV/view?usp=sharing
+# SECURITY MEASURES
 
 1. postAuthKey: Authentication key to validate that a request is made from our app or website<br>
 2. smsAuthKey: Authentication key to validate that our app or website wants to use the paid sms service<br>
@@ -112,6 +109,23 @@ Clone this to your machine repo with the help of steps from here: https://www.co
 32. Total sms count for admin and booth: Helps to observe misuse of sms credits
 <br>
 33. Random token to be sent with panel which will be required to cast vote: Attacker cannot cast a vote from other device in the small time window allotted for voting
-<br>
-<br>
-<br>
+
+# App Link
+https://github.com/Arnab-Banerjee-Kolkata/Vote_Online_App/blob/master/app/release/app-release.apk <br>
+
+# Website Link
+www.remote-voting.rf.gd <br>
+
+# Related repos
+Application: https://github.com/Arnab-Banerjee-Kolkata/Vote_Online_App <br>
+Website: https://github.com/Arnab-Banerjee-Kolkata/Vote_Online_Website <br>
+Public Election API: https://github.com/Arnab-Banerjee-Kolkata/Vote_Online_API <br>
+Public Election API Usages: https://github.com/Arnab-Banerjee-Kolkata/Vote_API_Usages <br>
+Private Poll API: https://github.com/Arnab-Banerjee-Kolkata/Private_Poll_API <br> 
+Private Poll API Usages: https://github.com/Arnab-Banerjee-Kolkata/PrivatePoll_API_Usage <br>
+
+# Developers
+Arnab Banerjee: https://github.com/Arnab-Banerjee-Kolkata <br>
+Abhijit Dey: https://github.com/bug-exterminator <br>
+Adarsha Shaw: https://github.com/adarshashaw <br>
+Rupsa De: https://github.com/RupsaDe <br>
