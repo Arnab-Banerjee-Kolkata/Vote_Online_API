@@ -1,4 +1,5 @@
 # Vote_Online_API
+API for public elections of remote voting platform.
 
 <b>Election status::</b><br><br>
     0: pending<br>
